@@ -48,7 +48,7 @@ void write_html_form_interface(FILE *dest, DDS *dds,
 void write_html_form_interface(ostream &strm, DDS *dds,
 			       const string &url,
 			       bool html_header = true,
-			       bool FONc = false,
+			       bool netcdf3_file_response = false, bool netcdf4_file_response = false,
 			       const string &admin_name = "support@opendap.org",
 			       const string &help_location = "http://www.opendap.org/online_help_files/opendap_form_help.html");
 

@@ -53,58 +53,53 @@
 
 using namespace dap_html_form;
 
-void
-BESWWWTransmit::send_basic_form(BESResponseObject * obj,
-                                BESDataHandlerInterface & dhi)
+void BESWWWTransmit::send_basic_form(BESResponseObject * obj, BESDataHandlerInterface & dhi)
 {
-    dhi.first_container();
-    try {
-        BESDEBUG( "www", "converting dds to www dds" << endl );
+	dhi.first_container();
+	try {
+		BESDEBUG("www", "converting dds to www dds" << endl);
 
-	DDS *dds = dynamic_cast<BESWWW*>(obj)->get_dds()->get_dds() ;
-        DDS *wwwdds = dds_to_www_dds( dds ) ;
+		DDS *dds = dynamic_cast<BESWWW*>(obj)->get_dds()->get_dds();
+		DDS *wwwdds = dds_to_www_dds(dds);
 #if 0
-        DAS *das = dynamic_cast<BESWWW*>(obj)->get_das()->get_das() ;
-        wwwdds->transfer_attributes( das ) ;
+		DAS *das = dynamic_cast<BESWWW*>(obj)->get_das()->get_das();
+		wwwdds->transfer_attributes( das );
 #endif
-        BESDEBUG( "www", "writing form" << endl );
+		BESDEBUG("www", "writing form" << endl);
 
-        string url = dhi.data[WWW_URL];
+		string url = dhi.data[WWW_URL];
 
-	// Look for the netcdf format in the dap service. If present
-	// then have the interface make a button for it.
-	BESServiceRegistry *registry = BESServiceRegistry::TheRegistry() ;
-        bool FONc = registry->service_available( OPENDAP_SERVICE,
-						 DATA_SERVICE,
-						 "netcdf" ) ;
+		// Look for the netcdf format in the dap service. If present
+		// then have the interface make a button for it.
+		BESServiceRegistry *registry = BESServiceRegistry::TheRegistry();
+		bool netcdf3_file_response = registry->service_available(OPENDAP_SERVICE, DATA_SERVICE, "netcdf");
+		// TODO change this so that it actually tests for the netcdf4 capability. I'm
+		// not sure how to do that, so just assume the handler has it. jhrg 9/23/13
+		bool netcdf4_file_response = registry->service_available(OPENDAP_SERVICE, DATA_SERVICE, "netcdf");
+		write_html_form_interface(dhi.get_output_stream(), wwwdds, url, false /*send mime headers*/,
+				netcdf3_file_response, netcdf4_file_response);
 
-        write_html_form_interface(dhi.get_output_stream(), wwwdds, url, false, FONc);
+		BESDEBUG("www", "done transmitting form" << endl);
 
-        BESDEBUG( "www", "done transmitting form" << endl );
-
-	delete wwwdds ;
-    }
-    catch( InternalErr &e )
-    {
-        string err = "Failed to write html form: " + e.get_error_message() ;
-        throw BESDapError( err, true, e.get_error_code(), __FILE__, __LINE__ ) ;
-    }
-    catch( Error &e )
-    {
-        string err = "Failed to write html form: " + e.get_error_message() ;
-        throw BESDapError( err, false, e.get_error_code(), __FILE__, __LINE__ );
-    }
-    catch(...)
-    {
-        string err = "Failed to write html form: Unknown exception caught";
-        throw BESInternalFatalError( err, __FILE__, __LINE__ ) ;
-    }
+		delete wwwdds;
+	}
+	catch (InternalErr &e) {
+		string err = "Failed to write html form: " + e.get_error_message();
+		throw BESDapError(err, true, e.get_error_code(), __FILE__, __LINE__);
+	}
+	catch (Error &e) {
+		string err = "Failed to write html form: " + e.get_error_message();
+		throw BESDapError(err, false, e.get_error_code(), __FILE__, __LINE__);
+	}
+	catch (...) {
+		string err = "Failed to write html form: Unknown exception caught";
+		throw BESInternalFatalError(err, __FILE__, __LINE__);
+	}
 }
 
-void BESWWWTransmit::send_http_form(BESResponseObject * obj,
-                                    BESDataHandlerInterface & dhi)
+void BESWWWTransmit::send_http_form(BESResponseObject * obj, BESDataHandlerInterface & dhi)
 {
-    set_mime_text(dhi.get_output_stream(), unknown_type, x_plain);
-    BESWWWTransmit::send_basic_form(obj, dhi);
+	set_mime_text(dhi.get_output_stream(), unknown_type, x_plain);
+	BESWWWTransmit::send_basic_form(obj, dhi);
 }
 

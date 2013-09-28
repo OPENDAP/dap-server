@@ -256,10 +256,9 @@ void write_html_form_interface(FILE * dest, DDS * dds,
     by default; otherwise, this is locataion where an HTML document that
     explains the page can be found.
     */
-void write_html_form_interface(ostream &strm, DDS * dds,
-                               const string & url, bool html_header, bool FONc,
-                               const string & admin_name,
-                               const string & help_location)
+void write_html_form_interface(ostream &strm, DDS * dds, const string & url, bool html_header,
+		bool netcdf3_file_response, bool netcdf4_file_response, const string & admin_name,
+		const string & help_location)
 {
     wo = new WWWOutput(strm);
 
@@ -283,7 +282,7 @@ void write_html_form_interface(ostream &strm, DDS * dds,
         "<p><h2 align='center'>OPeNDAP Server Dataset Access Form</h2>\n"
         << "<hr>\n" << "<form action=\"\">\n" << "<table>\n";
 
-    wo->write_disposition(url, FONc);
+    wo->write_disposition(url, netcdf3_file_response, netcdf4_file_response);
 
     strm << "<tr><td><td><hr>\n\n" ;
 

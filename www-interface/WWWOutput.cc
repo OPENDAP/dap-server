@@ -67,15 +67,17 @@ WWWOutput::WWWOutput(ostream &strm, int rows, int cols)
     : d_strm(&strm), d_attr_rows(rows), d_attr_cols(cols)
 {
 }
-#if 1
+
 // TODO: Can this be removed?
 void
 WWWOutput::write_html_header()
 {
+#if 1
     set_mime_html(*d_strm, unknown_type, dap_version(), x_plain);
-}
 #endif
-void WWWOutput::write_disposition(string url, bool FONc)
+}
+
+void WWWOutput::write_disposition(string url, bool netcdf3_file_response, bool netcdf4_file_response)
 {
     // To get the size to be a function of the image window size, you need to
     // use some JavaScript code to generate the HTML. C++ --> JS --> HTML.
@@ -88,9 +90,12 @@ void WWWOutput::write_disposition(string url, bool FONc)
 <td>\n\
 <input type=\"button\" value=\"Get ASCII\" onclick=\"ascii_button()\">\n";
 
-    // Add new netcdf_button call here *** jhrg 2/9/09
-    if (FONc)
-	*d_strm << "<input type=\"button\" value=\"Get as NetCDF\" onclick=\"binary_button('nc')\">\n";
+    // Add new netcdf_button call here jhrg 2/9/09
+    if (netcdf3_file_response)
+    	*d_strm << "<input type=\"button\" value=\"Get as NetCDF 3\" onclick=\"binary_button('nc')\">\n";
+    // Add new new netcdf4 button. jhrg 9/23/13
+    if (netcdf4_file_response)
+    	*d_strm << "<input type=\"button\" value=\"Get as NetCDF 4\" onclick=\"binary_button('dap.nc4')\">\n";
 
     *d_strm <<
 "<input type=\"button\" value=\"Binary (DAP) Object\" onclick=\"binary_button('dods')\">\n\
