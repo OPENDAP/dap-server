@@ -25,19 +25,18 @@
 
 #include <DataDDS.h>
 
-using namespace libdap ;
-
-class libdap::BaseType ;
+namespace libdap {
+    class BaseType ;
+}
 
 namespace dap_asciival {
 
-void get_data_values_as_ascii(DataDDS *dds, FILE *dest);
-void get_data_values_as_ascii(DataDDS *dds, ostream &strm);
+    void get_data_values_as_ascii(libdap::DataDDS *dds, FILE *dest);
+    void get_data_values_as_ascii(libdap::DataDDS *dds, std::ostream &strm);
 
-DataDDS *datadds_to_ascii_datadds( DataDDS *dds ) ;
+    libdap::DataDDS *datadds_to_ascii_datadds(libdap::DataDDS *dds);
 
-BaseType *basetype_to_asciitype( BaseType *bt ) ;
-
+    libdap::BaseType *basetype_to_asciitype(libdap::BaseType *bt);
 }
 
 #endif // E_get_ascii_h

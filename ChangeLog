@@ -1,10 +1,40 @@
+2014-03-26  James Gallagher <jgallagher@opendap.org>
+
+	Fixed namepace libdap.
+
+	M    asciival/get_ascii.h
+
+2013-10-01  James Gallagher <jgallagher@opendap.org>
+
+	Updated the FSF address in the copyright headers
+
+2013-09-26  James Gallagher <jgallagher@opendap.org>
+
+	removed -fno-defer-pop from all copies of Makefile.am since the
+	new OSX compiler prints warnings about it and it seems to not make
+	a difference with newer g++ versions.
+
+2013-09-25  James Gallagher <jgallagher@opendap.org>
+
+	Modified the web form so that it has a button for netcdf 3 and netcdf 4
+	file responses.
+
+	M    www-interface/BESWWWTransmit.cc
+	M    www-interface/WWWOutput.cc
+	M    www-interface/WWWOutput.h
+	M    www-interface/get_html_form.cc
+	M    www-interface/get_html_form.h
+
+2013-08-28  Nathan Potter <ndp@coas.oregonstate.edu>
+
+	dap-server: Updating version number, changelog, etc. for pending Hyrax 1.9 release
+
 2013-05-20  James Gallagher <jgallagher@opendap.org>
 
-	Added an explicit encoding type so that the set_mime_*() functions could differentiate between the new code moved to mime_util.cc/.h from ResponseBuilder and the old, deprecated, code already in mime_util.
-
-2013-05-20  James Gallagher <jgallagher@opendap.org>
-
-	Added an explicit encoding type so that the set_mime_*() functions could differentiate between the new code moved to mime_util.cc/.h from ResponseBuilder and the old, deprecated, code already in mime_util.
+	Added an explicit encoding type so that the set_mime_*() functions
+	could differentiate between the new code moved to mime_util.cc/.h
+	from ResponseBuilder and the old, deprecated, code already in
+	mime_util.
 
 2013-01-22  James Gallagher <jgallagher@opendap.org>
 
