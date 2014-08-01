@@ -1,3 +1,36 @@
+2014-07-31  James Gallagher <jgallagher@opendap.org>
+
+	Cleaned up some of the error messages
+
+2014-07-30  James Gallagher <jgallagher@opendap.org>
+
+	Fix a leak where eval_function_clauses() was called and the original
+	DataDDS was not deleted before setting the new DataDDS in the BES
+	Response object.
+
+	M    asciival/BESAsciiTransmit.cc
+
+2014-07-30  James Gallagher <jgallagher@opendap.org>
+
+	I added a comment about a potential memory leak to BESAsciiTransmit.cc
+
+2014-04-22  James Gallagher <jgallagher@opendap.org>
+
+	Updated for 4.1.4
+
+	M    ChangeLog
+	M    INSTALL
+	M    NEWS
+	M    README
+	M    configure.ac
+	M    dap-server.spec
+
+2014-03-26  James Gallagher <jgallagher@opendap.org>
+
+	Fixed namepace libdap.
+
+	M    asciival/get_ascii.h
+
 2014-03-26  James Gallagher <jgallagher@opendap.org>
 
 	Fixed namepace libdap.
