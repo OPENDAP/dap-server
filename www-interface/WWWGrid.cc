@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 
@@ -65,6 +65,7 @@ WWWGrid::WWWGrid(const string & n) : Grid(n)
 WWWGrid::WWWGrid(Grid * grid): Grid(grid->name())
 {
     BaseType *bt = basetype_to_wwwtype(grid->array_var());
+    bt->set_attr_table(grid->array_var()->get_attr_table());
     add_var(bt, array);
     delete bt;
 
@@ -72,6 +73,7 @@ WWWGrid::WWWGrid(Grid * grid): Grid(grid->name())
     Grid::Map_iter e = grid->map_end();
     while ( i != e ) {
         Array *at = dynamic_cast<Array *>(basetype_to_wwwtype(*i));
+        at->set_attr_table((*i)->get_attr_table());
         add_var(at, maps);
         delete at;
         ++i;

@@ -1,4 +1,3 @@
-
 // -*- mode: c++; c-basic-offset:4 -*-
 
 // This file is part of asciival, software which can return an ASCII
@@ -19,7 +18,7 @@
 // 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 
@@ -34,7 +33,7 @@
 
 #include "AsciiOutput.h"
 #include "AsciiOutputFactory.h"
-#include <test_config.h>
+#include "test_config.h"
 //#include "name_map.h"
 
 // These globals are defined in ascii_val.cc and are needed by the Ascii*
@@ -44,29 +43,38 @@
 // addition to its regular lineage. This test code depends on being able to
 // cast each variable to an AsciiOutput object. 01/24/03 jhrg
 bool translate = false;
-
+extern int ddsdebug;
 using namespace CppUnit;
 
-class AsciiOutputTest : public TestFixture {
+class AsciiOutputTest: public TestFixture {
 private:
     DDS *dds;
     AsciiOutputFactory *aof;
-    
-public: 
-    AsciiOutputTest() {}
-    ~AsciiOutputTest() {}
+
+public:
+    AsciiOutputTest() {
+    }
+    ~AsciiOutputTest() {
+    }
 
     void setUp() {
-        aof = new AsciiOutputFactory;
-	dds = new DDS(aof, "ascii_output_test");
-	string parsefile = (string)TEST_SRC_DIR
-			    + "/testsuite/AsciiOutputTest1.dds";
-	dds->parse(parsefile);
+        try {
+            DBG2(ddsdebug = 1);
+            aof = new AsciiOutputFactory;
+            dds = new DDS(aof, "ascii_output_test");
+            string parsefile = (string) TEST_SRC_DIR + "/testsuite/AsciiOutputTest1.dds";
+            DBG2(cerr << "parsefile: " << parsefile << endl);
+            dds->parse(parsefile);
+        } catch (Error &e) {
+            cerr << "Error: " << e.get_error_message() << endl;
+        }
     }
 
     void tearDown() {
-        delete aof; aof = 0;
-	delete dds; dds = 0;
+        delete aof;
+        aof = 0;
+        delete dds;
+        dds = 0;
     }
 
     CPPUNIT_TEST_SUITE(AsciiOutputTest);
@@ -76,27 +84,23 @@ public:
     CPPUNIT_TEST_SUITE_END();
 
     void test_get_full_name() {
-	CPPUNIT_ASSERT(dynamic_cast<AsciiOutput*>(dds->var("a"))->get_full_name() == "a");
-	DBG(cerr << "full name: " 
-	     << dynamic_cast<AsciiOutput*>(dds->var("e.c"))->get_full_name()
-	     << endl);
+        CPPUNIT_ASSERT(dynamic_cast<AsciiOutput*>(dds->var("a"))->get_full_name() == "a");
+        DBG(cerr << "full name: " << dynamic_cast<AsciiOutput*> (dds->var("e.c"))->get_full_name() << endl);
 
-	CPPUNIT_ASSERT(dynamic_cast<AsciiOutput*>(dds->var("e.c"))->get_full_name() == "e.c");
-	CPPUNIT_ASSERT(dynamic_cast<AsciiOutput*>(dds->var("f.c"))->get_full_name() == "f.c");
-	CPPUNIT_ASSERT(dynamic_cast<AsciiOutput*>(dds->var("g.y"))->get_full_name() == "g.y");
-	CPPUNIT_ASSERT(dynamic_cast<AsciiOutput*>(dds->var("k.h.i"))->get_full_name() == "k.h.i");
+        CPPUNIT_ASSERT(dynamic_cast<AsciiOutput*>(dds->var("e.c"))->get_full_name() == "e.c");
+        CPPUNIT_ASSERT(dynamic_cast<AsciiOutput*>(dds->var("f.c"))->get_full_name() == "f.c");
+        CPPUNIT_ASSERT(dynamic_cast<AsciiOutput*>(dds->var("g.y"))->get_full_name() == "g.y");
+        CPPUNIT_ASSERT(dynamic_cast<AsciiOutput*>(dds->var("k.h.i"))->get_full_name() == "k.h.i");
     }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(AsciiOutputTest);
 
-int 
-main( int argc, char* argv[] )
-{
+int main(int argc, char* argv[]) {
     CppUnit::TextTestRunner runner;
-    runner.addTest( CppUnit::TestFactoryRegistry::getRegistry().makeTest() );
+    runner.addTest(CppUnit::TestFactoryRegistry::getRegistry().makeTest());
 
-    bool wasSuccessful = runner.run( "", false ) ;
+    bool wasSuccessful = runner.run("", false);
 
     return wasSuccessful ? 0 : 1;
 }

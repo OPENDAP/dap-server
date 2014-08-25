@@ -19,7 +19,7 @@
 // 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 
@@ -43,7 +43,7 @@ using namespace libdap ;
 class WWWFloat64: public Float64 {
 public:
     WWWFloat64(const string &n);
-    WWWFloat64( Float64 *bt ) : Float64( bt->name() ) {}
+    WWWFloat64( Float64 *bt ) : Float64( *bt ) {}
     virtual ~WWWFloat64() {}
 
     virtual BaseType *ptr_duplicate();

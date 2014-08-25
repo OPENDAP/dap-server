@@ -1,10 +1,13 @@
 
-Updated for version 3.9.3 of the OPeNDAP Server Software.
+Updated for version 4.1.5 of the dap-server package 
 
 This package contains general purpose handlers for use with the new
 Hyrax data server. These are the Usage, ASCII and HTML form handlers.
 Each takes input from a 'data handler' and returns a HTML or plain text
 response --- something other than a DAP response object.
+
+The older versions of this package contained the 'Server3' CGI software; that
+has been removed.
 
 Hyrax BES module
 

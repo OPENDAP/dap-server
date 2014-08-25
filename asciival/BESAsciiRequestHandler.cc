@@ -18,18 +18,17 @@
 // 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // You can contact University Corporation for Atmospheric Research at
 // 3080 Center Green Drive, Boulder, CO 80301
- 
+
 // (c) COPYRIGHT University Corporation for Atmospheric Research 2004-2005
 // Please read the full copyright statement in the file COPYRIGHT_UCAR.
 //
 // Authors:
 //      pwest       Patrick West <pwest@ucar.edu>
 //      jgarcia     Jose Garcia <jgarcia@ucar.edu>
-
 
 #include "BESAsciiRequestHandler.h"
 #include "BESResponseHandler.h"
@@ -38,53 +37,51 @@
 #include "BESDataNames.h"
 #include "config.h"
 
-BESAsciiRequestHandler::BESAsciiRequestHandler( const string &name )
-    : BESRequestHandler( name )
+BESAsciiRequestHandler::BESAsciiRequestHandler(const string &name) :
+        BESRequestHandler(name)
 {
-    add_handler( HELP_RESPONSE, BESAsciiRequestHandler::dap_build_help ) ;
-    add_handler( VERS_RESPONSE, BESAsciiRequestHandler::dap_build_version ) ;
+    add_handler(HELP_RESPONSE, BESAsciiRequestHandler::dap_build_help);
+    add_handler(VERS_RESPONSE, BESAsciiRequestHandler::dap_build_version);
 }
 
 BESAsciiRequestHandler::~BESAsciiRequestHandler()
 {
 }
 
-bool
-BESAsciiRequestHandler::dap_build_help( BESDataHandlerInterface &dhi )
+bool BESAsciiRequestHandler::dap_build_help(BESDataHandlerInterface &dhi)
 {
     // the usage request handler is already loading this and, since all
     // three dap-server modules are usually loaded, we'll assume it's
     // already taken care of
     /*
-    BESResponseObject *response = dhi.response_handler->get_response_object() ;
-    BESInfo *info = dynamic_cast < BESInfo * >(response) ;
-    if( !info )
-	throw BESInternalError( "cast error", __FILE__, __LINE__ ) ;
+     BESResponseObject *response = dhi.response_handler->get_response_object() ;
+     BESInfo *info = dynamic_cast < BESInfo * >(response) ;
+     if( !info )
+     throw BESInternalError( "cast error", __FILE__, __LINE__ ) ;
 
-    map<string,string> attrs ;
-    string name = (string)PACKAGE_NAME + "/ascii" ;
-    attrs["name"] = name ;
-    attrs["version"] = PACKAGE_VERSION ;
-    info->begin_tag( "module", &attrs ) ;
-    info->add_data_from_file( "DAP-SERVER.Help", "Dap server Help" ) ;
-    info->end_tag( "module" ) ;
-    */
+     map<string,string> attrs ;
+     string name = (string)PACKAGE_NAME + "/ascii" ;
+     attrs["name"] = name ;
+     attrs["version"] = PACKAGE_VERSION ;
+     info->begin_tag( "module", &attrs ) ;
+     info->add_data_from_file( "DAP-SERVER.Help", "Dap server Help" ) ;
+     info->end_tag( "module" ) ;
+     */
 
-    return true ;
+    return true;
 }
 
-bool
-BESAsciiRequestHandler::dap_build_version( BESDataHandlerInterface &dhi )
+bool BESAsciiRequestHandler::dap_build_version(BESDataHandlerInterface &dhi)
 {
-    BESResponseObject *response = dhi.response_handler->get_response_object() ;
-    BESVersionInfo *info = dynamic_cast < BESVersionInfo * >(response) ;
-    if( !info )
-	throw BESInternalError( "cast error", __FILE__, __LINE__ ) ;
+    BESResponseObject *response = dhi.response_handler->get_response_object();
+    BESVersionInfo *info = dynamic_cast<BESVersionInfo *>(response);
+    if (!info)
+        throw BESInternalError("cast error", __FILE__, __LINE__);
 
-    string name = (string)PACKAGE_NAME + "/ascii" ;
-    info->add_module( name, PACKAGE_VERSION ) ;
+    string name = (string) PACKAGE_NAME + "/ascii";
+    info->add_module(name, PACKAGE_VERSION);
 
-    return true ;
+    return true;
 }
 
 /** @brief dumps information about this object
@@ -93,13 +90,11 @@ BESAsciiRequestHandler::dap_build_version( BESDataHandlerInterface &dhi )
  *
  * @param strm C++ i/o stream to dump the information to
  */
-void
-BESAsciiRequestHandler::dump( ostream &strm ) const
+void BESAsciiRequestHandler::dump(ostream &strm) const
 {
-    strm << BESIndent::LMarg << "BESAsciiRequestHandler::dump - ("
-			     << (void *)this << ")" << endl ;
-    BESIndent::Indent() ;
-    BESRequestHandler::dump( strm ) ;
-    BESIndent::UnIndent() ;
+    strm << BESIndent::LMarg << "BESAsciiRequestHandler::dump - (" << (void *) this << ")" << endl;
+    BESIndent::Indent();
+    BESRequestHandler::dump(strm);
+    BESIndent::UnIndent();
 }
 

@@ -3,16 +3,34 @@ dnl -*- autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(dap-server, 3.9.3, opendap-tech@opendap.org)
+AC_INIT(dap-server, 4.1.5, opendap-tech@opendap.org)
 AC_CONFIG_AUX_DIR([conf])
 AC_CONFIG_MACRO_DIR([conf])
 
 AM_INIT_AUTOMAKE(1.10)
+
+# The handler is a shared object library, so we don't normally need
+# the static lib. Override this default by specifying `--enable-static',
+# which can make running unit tests with valgrind far more pleasant. 
+AM_DISABLE_STATIC
+
 AC_CONFIG_SRCDIR([usage.cc])
 AM_CONFIG_HEADER([config.h])
 
 AC_DEFINE([DAP_PROTOCOL_VERSION], ["3.2"], [What DAP version is supported?])
 AC_SUBST([DAP_PROTOCOL_VERSION])
+
+
+PACKAGE_MAJOR_VERSION=`echo $PACKAGE_VERSION | sed 's@^\([[0-9]]\)*\.\([[0-9]]*\)\.\([[0-9]]*\)$@\1@'`
+PACKAGE_MINOR_VERSION=`echo $PACKAGE_VERSION | sed 's@^\([[0-9]]\)*\.\([[0-9]]*\)\.\([[0-9]]*\)$@\2@'`
+PACKAGE_SUBMINOR_VERSION=`echo $PACKAGE_VERSION | sed 's@^\([[0-9]]\)*\.\([[0-9]]*\)\.\([[0-9]]*\)$@\3@'`
+AC_MSG_NOTICE(Package Major Version:     $PACKAGE_MAJOR_VERSION)
+AC_MSG_NOTICE(Package Minor Version:     $PACKAGE_MINOR_VERSION)
+AC_MSG_NOTICE(Package SubMinor Version:  $PACKAGE_SUBMINOR_VERSION)
+AC_SUBST(PACKAGE_MAJOR_VERSION)
+AC_SUBST(PACKAGE_MINOR_VERSION)
+AC_SUBST(PACKAGE_SUBMINOR_VERSION)
+
 
 dnl flags for the compilers and linkers - set these before locating the
 dnl actual tools since some of the AC_PROG macros set these `flag variables'
@@ -28,7 +46,9 @@ AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 
-DODS_PROG_PERL
+dnl Perl is  used by www-interface during the build
+dnl DODS_PROG_PERL
+AC_CHECK_PROG([PERL], [perl], [`which perl`])
 
 dods_HTML_Filter=no
 if $PERL -e "use HTML::Filter;" > /dev/null 2>&1; then 
@@ -91,7 +111,7 @@ AC_SUBST([dap_cgiconfdir])
 AC_CHECK_FUNCS([putenv strtol])
 
 dnl Checks for specific libraries
-AC_CHECK_LIBDAP([3.9.0],
+AC_CHECK_LIBDAP([3.11.0],
  [
   LIBS="$LIBS $DAP_CLIENT_LIBS $DAP_SERVER_LIBS"
   CPPFLAGS="$CPPFLAGS $DAP_CFLAGS"
@@ -99,7 +119,7 @@ AC_CHECK_LIBDAP([3.9.0],
  [ AC_MSG_ERROR([Cannot find libdap])
 ])
 
-AC_CHECK_BES([3.7.2],
+AC_CHECK_BES([3.9.0],
 [
 ],
 [ AC_MSG_ERROR([Cannot find bes])
@@ -132,6 +152,7 @@ AH_BOTTOM([/* Shorthand for gcc's unused attribute feature */
 AC_CONFIG_FILES([Makefile
                  asciival/Makefile
 		 asciival/unit-tests/Makefile
+		 asciival/unit-tests/test_config.h
                  www-interface/Makefile])
                  
 AC_CONFIG_FILES([www-interface/js2h.pl], [chmod +x www-interface/js2h.pl])

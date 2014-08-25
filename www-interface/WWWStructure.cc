@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 
@@ -67,6 +67,7 @@ WWWStructure::WWWStructure(Structure *bt) :
     Vars_iter p = bt->var_begin();
     while (p != bt->var_end()) {
         BaseType *new_bt = basetype_to_wwwtype(*p);
+        new_bt->set_attr_table((*p)->get_attr_table());
         add_var(new_bt);
         delete new_bt;
         p++;

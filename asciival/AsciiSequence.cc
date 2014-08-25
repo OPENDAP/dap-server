@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 
@@ -92,10 +92,10 @@ int
 AsciiSequence::element_count(bool leaves)
 {
     if (!leaves)
-        return _vars.size();
+        return d_vars.size();
     else {
         int i = 0;
-        for (Vars_iter iter = _vars.begin(); iter != _vars.end(); iter++) {
+        for (Vars_iter iter = d_vars.begin(); iter != d_vars.end(); iter++) {
             if ((*iter)->send_p())
                 i += (*iter)->element_count(true);
         }

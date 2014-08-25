@@ -18,7 +18,7 @@
 // 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // You can contact University Corporation for Atmospheric Research at
 // 3080 Center Green Drive, Boulder, CO 80301
@@ -33,20 +33,27 @@
 #ifndef I_BESAsciiTransmit_h
 #define I_BESAsciiTransmit_h 1
 
-#include "BESDataHandlerInterface.h"
+#include <BESDataHandlerInterface.h>
+#include <BESBasicTransmitter.h>
 
+class BESContainer;
 class BESResponseObject ;
 
 #define ASCII_TRANSMITTER "ascii"
+#define DAP4_CSV_TRANSMITTER "csv"
 
-class BESAsciiTransmit
+class BESAsciiTransmit: public BESBasicTransmitter
 {
 public:
-    static void		send_basic_ascii( BESResponseObject *obj,
-    				          BESDataHandlerInterface &dhi ) ;
-    static void		send_http_ascii( BESResponseObject *obj,
-    				         BESDataHandlerInterface &dhi ) ;
+	BESAsciiTransmit();
+    virtual ~BESAsciiTransmit()
+    {
+    }
+
+    static void		send_basic_ascii( BESResponseObject *obj, BESDataHandlerInterface &dhi ) ;
+    static void		send_http_ascii( BESResponseObject *obj, BESDataHandlerInterface &dhi ) ;
 } ;
+
 
 #endif // I_BESAsciiTransmit_h
 

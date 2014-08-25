@@ -18,7 +18,7 @@
 // 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // You can contact University Corporation for Atmospheric Research at
 // 3080 Center Green Drive, Boulder, CO 80301
@@ -51,22 +51,28 @@
 class BESWWW : public BESResponseObject
 {
 private:
+#if 0
     BESDASResponse *_das ;
+#endif
     BESDDSResponse *_dds ;
 
-	BESWWW() {}
+    BESWWW() {}
 
 public:
-    BESWWW( BESDASResponse *das, BESDDSResponse *dds )
-	: _das( das ), _dds( dds ) {}
+    BESWWW( /* BESDASResponse *das,*/ BESDDSResponse *dds )
+	: /*_das( das ),*/ _dds( dds ) {}
     virtual ~ BESWWW() {
-        if (_das)
+#if 0
+	if (_das)
             delete _das;
-        if (_dds)
+#endif
+	if (_dds)
             delete _dds;
     }
 
+#if 0
     BESDASResponse *get_das() { return _das ; }
+#endif
     BESDDSResponse *get_dds() { return _dds ; }
 
     /** @brief dumps information about this object
@@ -79,7 +85,9 @@ public:
     virtual void dump(ostream & strm) const {
         strm << BESIndent::LMarg << "dump - (" << (void *) this << ")" << endl;
         BESIndent::Indent();
+#if 0
         strm << BESIndent::LMarg << "das: " << *_das << endl;
+#endif
         strm << BESIndent::LMarg << "dds: " << *_dds << endl;
         BESIndent::UnIndent();
     }

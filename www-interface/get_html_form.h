@@ -16,7 +16,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 
@@ -48,7 +48,7 @@ void write_html_form_interface(FILE *dest, DDS *dds,
 void write_html_form_interface(ostream &strm, DDS *dds,
 			       const string &url,
 			       bool html_header = true,
-			       bool FONc = false,
+			       bool netcdf3_file_response = false, bool netcdf4_file_response = false,
 			       const string &admin_name = "support@opendap.org",
 			       const string &help_location = "http://www.opendap.org/online_help_files/opendap_form_help.html");
 
@@ -63,6 +63,10 @@ void write_simple_variable(FILE *os, BaseType *var);
 void write_simple_variable(ostream &strm, BaseType *var);
                            // const string &name,
                            // const string &type);
+#if 0
+void write_attributes(ostream &os, AttrTable &attr, const string &prefix);
+void write_simple_var_attributes(ostream &os, int rows, int cols, BaseType *btp);
+#endif
 
 /** Return a string which describes the datatype of a DODS variable.
 

@@ -16,7 +16,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 
@@ -109,9 +109,44 @@ BaseType *basetype_to_wwwtype(BaseType * bt)
     @return A DDS where each variable in \e dds is now a WWW* variable. */
 DDS *dds_to_www_dds(DDS * dds)
 {
+#if 0
+    // Using the factory class has no effect because it does not control
+    // how a class like Structure or Grid builds child instances, so we have
+    // to use the basetype_to_wwwtype() function.
+    WWWOutputFactory wwwfactory;
+    dds->set_factory(&wwwfactory);
+#endif
+    // Use the copy constructor to copy all the various private fields in DDS
+    // including the attribute table for global attributes
+    DDS *wwwdds = new DDS(*dds);
+
+    // Because the DDS copy constructor copies the variables, we now, erase
+    // them and...
+    wwwdds->del_var(wwwdds->var_begin(), wwwdds->var_end());
+
+    // Build copies of the variables using the WWW* types and manually add
+    // their attribute tables.
+    DDS::Vars_iter i = dds->var_begin();
+    while (i != dds->var_end()) {
+        BaseType *abt = basetype_to_wwwtype(*i);
+        abt->set_attr_table((*i)->get_attr_table());
+#if 0
+        cerr << "dds attr: "; (*i)->get_attr_table().print(cerr); cerr << endl;
+        cerr << "abt attr: "; abt->get_attr_table().print(cerr); cerr << endl;
+#endif
+        wwwdds->add_var(abt);
+        // add_var makes a copy of the base type passed to it, so delete it
+        // here
+        delete abt;
+        i++;
+    }
+
+#if 0
     // Should the following use WWWOutputFactory instead of the source DDS'
     // factory class?
     DDS *wwwdds = new DDS(dds->get_factory(), dds->get_dataset_name());
+
+    wwwdds->set_attr_table(dds->get_attr_table);
 
     DDS::Vars_iter i = dds->var_begin();
     while (i != dds->var_end()) {
@@ -122,7 +157,7 @@ DDS *dds_to_www_dds(DDS * dds)
         delete abt;
         i++;
     }
-
+#endif
     return wwwdds;
 }
 
@@ -221,10 +256,9 @@ void write_html_form_interface(FILE * dest, DDS * dds,
     by default; otherwise, this is locataion where an HTML document that
     explains the page can be found.
     */
-void write_html_form_interface(ostream &strm, DDS * dds,
-                               const string & url, bool html_header, bool FONc,
-                               const string & admin_name,
-                               const string & help_location)
+void write_html_form_interface(ostream &strm, DDS * dds, const string & url, bool html_header,
+		bool netcdf3_file_response, bool netcdf4_file_response, const string & admin_name,
+		const string & help_location)
 {
     wo = new WWWOutput(strm);
 
@@ -248,7 +282,7 @@ void write_html_form_interface(ostream &strm, DDS * dds,
         "<p><h2 align='center'>OPeNDAP Server Dataset Access Form</h2>\n"
         << "<hr>\n" << "<form action=\"\">\n" << "<table>\n";
 
-    wo->write_disposition(url, FONc);
+    wo->write_disposition(url, netcdf3_file_response, netcdf4_file_response);
 
     strm << "<tr><td><td><hr>\n\n" ;
 
@@ -426,5 +460,53 @@ write_simple_variable(ostream &strm, BaseType *var)
 
     strm << "<br>\n\n";
 }
+#if 0
+void
+write_simple_var_attributes(FILE * os, BaseType *var)
+{
+    ostringstream ss;
+    write_simple_var_attributes(ss, var);
 
+    // Now write that string to os
+    fprintf(os, "%s", ss.str().c_str());
+}
+
+void
+write_simple_var_attributes(ostream &os, int rows, int cols, BaseType *btp)
+{
+    AttrTable &attr = btp->get_attr_table();
+
+    // Don't write anything if there are no attributes.
+    if (attr.get_size() == 0) {
+        return;
+    }
+
+    os << "<textarea name=\"" << btp->name()
+	   << "_attr\" rows=\"" << rows
+	   << "\" cols=\"" << cols << "\">\n" ;
+    write_attributes(os, attr, "");
+    os << "</textarea>\n\n" ;
+}
+
+void
+write_attributes(ostream &os, AttrTable &attr, const string &prefix)
+{
+    for (AttrTable::Attr_iter a = attr.attr_begin(); a != attr.attr_end(); ++a) {
+	if (attr.is_container(a))
+	    write_attributes(os, attr.get_attr_table(a), (prefix == "") ? attr.get_name(a) : prefix + string(".") + attr.get_name(a));
+	else {
+	    if (prefix != "")
+		os << prefix << "." << attr.get_name(a) << ": ";
+	    else
+		os << attr.get_name(a) << ": ";
+
+	    int num_attr = attr.get_attr_num(a) - 1;
+	    for (int i = 0; i < num_attr; ++i) {
+		os << attr.get_attr(a, i) << ", ";
+	    }
+	    os << attr.get_attr(a, num_attr) << "\n";
+	}
+    }
+}
+#endif
 } // namespace dap_html_form

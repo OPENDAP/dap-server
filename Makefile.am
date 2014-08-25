@@ -14,7 +14,6 @@ lib_besdir=$(libdir)/bes
 lib_bes_LTLIBRARIES = libusage_module.la
 besdir=$(datadir)/bes
 
-dist_bin_SCRIPTS = bes-dap-data.sh
 dist_bes_DATA = dap-server_help.html dap-server_help.txt
 
 USAGE_SOURCES = usage.cc usage.h 
@@ -30,29 +29,38 @@ libusage_module_la_LDFLAGS = -avoid-version -module
 libusage_module_la_LIBADD = $(BES_DAP_LIBS)
 
 EXTRA_DIST = COPYING COPYRIGHT_URI dap-server.spec README \
-	bes-dap-data.sh.in OSX_Resources
+	dap-server.conf.in OSX_Resources
 
-DISTCLEANFILES = stamp-nph-dods bes-dap-data.sh
-CLEANFILES = *~ bes-dap-data.sh
+DISTCLEANFILES = stamp-nph-dods dap-server.conf
 
-bes-dap-data.sh: bes-dap-data.sh.in config.status
-	$(do_subst) < $(srcdir)/bes-dap-data.sh.in > bes-dap-data.sh
-	chmod +x bes-dap-data.sh
+# Not nearly as clean as it could be, but this removes .svn directories
+# in subdirs.
+dist-hook:
+	rm -rf `find $(distdir) -name .svn`
 
-do_subst = sed -e 's,[@]sysconfdir[@],$(sysconfdir),g' \
-               -e 's,[@]libdir[@],$(libdir),g' \
-               -e 's,[@]datadir[@],$(datadir),g'
+install-data-local: dap-server.conf
+	@currdate=`date +"%y%m%d%H%M"`; \
+	test -d $(DESTDIR)$(sysconfdir)/bes || $(MKDIR_P) $(DESTDIR)$(sysconfdir)/bes; \
+	test -d $(DESTDIR)$(sysconfdir)/bes/modules || $(MKDIR_P) $(DESTDIR)$(sysconfdir)/bes/modules; \
+	test -f $(DESTDIR)$(sysconfdir)/bes/modules/dap-server.conf && mv -f $(DESTDIR)$(sysconfdir)/bes/modules/dap-server.conf $(DESTDIR)$(sysconfdir)/bes/modules/dap-server.conf.$$currdate; \
+	$(INSTALL_DATA) dap-server.conf $(DESTDIR)$(sysconfdir)/bes/modules/dap-server.conf
 
-# This makes sure that the handler modifies the bes  which confiure found
-# even with distcheck is run.
-bes-conf: bes-dap-data.sh
-	(bes_prefix=`bes-config --prefix` ; \
-	if test "$$bes_prefix" = "/usr" ; \
-	 then \
-	    ./bes-dap-data.sh /etc/bes/bes.conf /usr/lib/bes ;\
-	else \
-	    ./bes-dap-data.sh $$bes_prefix/etc/bes/bes.conf $$bes_prefix/lib/bes ;\
-	fi)
+uninstall-local:
+	rm -f $(DESTDIR)$(sysconfdir)/bes/modules/dap-server.conf
+
+dap-server.conf: dap-server.conf.in config.status
+	sed -e "s%[@]bes_modules_dir[@]%${lib_besdir}%" $< > dap-server.conf
+
+C4_DIR=./cccc
+C4_USAGE=--html_outfile=cccc-usage.html --xml_outfile=cccc-usage.xml --db_outfile=cccc-usage.db
+C4_ASC=--html_outfile=cccc-asc.html --xml_outfile=cccc-asc.xml --db_outfile=cccc-asc.db
+C4_WWW=--html_outfile=cccc-www.html --xml_outfile=cccc-www.xml --db_outfile=cccc-www.db
+
+.PHONY: cccc
+cccc:	
+	cccc --outdir=$(C4_DIR) $(C4_USAGE) $(libusage_module_la_SOURCES)
+	cccc --outdir=$(C4_DIR) $(C4_ASC) asciival/*.{cc,h}
+	cccc --outdir=$(C4_DIR) $(C4_WWW) www-interface/*.{cc,h}
 
 ###########################################################################
 
@@ -77,47 +85,65 @@ fortifyclean:
 # Build linux RPMs
 
 srpm: dist
-	rpmbuild -ts @PACKAGE@-@PACKAGE_VERSION@.tar.gz
+	rpmbuild -ts --clean $(RPM_OPTIONS) @PACKAGE@-@PACKAGE_VERSION@.tar.gz
 
 rpm: dist
-	rpmbuild -tb @PACKAGE@-@PACKAGE_VERSION@.tar.gz
+	rpmbuild -tb --clean $(RPM_OPTIONS) @PACKAGE@-@PACKAGE_VERSION@.tar.gz
 
 ###########################################################################
 
-# Build OS/X Packages.
 
-PACKAGEMAKER=/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker*
+# Build OS/X Packages. The strange operations with configure and make
+# are there so that the values built into bes-config will match the mac
+# osx install dirs and not the temp directory used to build the packages
 
-UNIV_ARCH=-arch ppc -arch i386
-MAC_SYSROOT=Developer/SDKs/MacOSX10.4u.sdk
-
+PACKAGEMAKER=/Developer/usr/bin/packagemaker
 PKG_CONF_FLAGS=
 
 clean-pkg:
 	-rm -rf mac_osx @PACKAGE@-@PACKAGE_VERSION@.pkg @PACKAGE@-@PACKAGE_VERSION@
 
-pkg-build:
-	./configure --prefix=/usr --disable-dependency-tracking $(PKG_CONF_FLAGS)
+pkg-build: clean-pkg
+	./configure --prefix=$(prefix) --disable-dependency-tracking $(PKG_CONF_FLAGS)
 	make clean all
-	DESTDIR=${PWD}/mac_osx make install
+	DESTDIR=`pwd`/mac_osx make install
 
-pkg-main:
-	./OSX_Resources/update_mac_package_contents.pl README "configure.ac" "mac_osx/usr"
-	${PACKAGEMAKER} -build -p @PACKAGE@-@PACKAGE_VERSION@.pkg \
-		-f mac_osx/usr \
-		-ds -r OSX_Resources \
-		-i OSX_Resources/Info.plist \
-		-d OSX_Resources/Description.plist
-	-rm -rf mac_osx
+pkg-main: pkg-build
+	./OSX_Resources/update_mac_package_contents.pl README
+	cat ./OSX_Resources/InstallationCheck.proto | sed -e "s^_PREFIX_^$(prefix)^g" > foo
+	mv foo ./OSX_Resources/InstallationCheck
+	cat ./OSX_Resources/Info.plist.proto | \
+	   sed -e "s^_PREFIX_^$(prefix)^g" \
+	       -e "s^_FULL_VERSION_^@PACKAGE_VERSION@^g" \
+	       -e "s^_MAJOR_VERSION_^@PACKAGE_MAJOR_VERSION@^g" \
+	       -e "s^_MINOR_VERSION_^@PACKAGE_MINOR_VERSION@^g" \
+	       > foo
+	mv foo ./OSX_Resources/Info.plist
+	${PACKAGEMAKER} --root mac_osx --id org.opendap.@PACKAGE@ \
+		--title "@PACKAGE@ @PACKAGE_VERSION@" --version @PACKAGE_VERSION@ \
+		--out @PACKAGE@-@PACKAGE_VERSION@.pkg --resources OSX_Resources
 
-pkg-dmg:
+pkg-dmg: pkg-main
 	-rm -rf @PACKAGE@-@PACKAGE_VERSION@
 	-rm -rf @PACKAGE@-@PACKAGE_VERSION@.dmg
 	mkdir @PACKAGE@-@PACKAGE_VERSION@
-	mv @PACKAGE@-@PACKAGE_VERSION@.pkg @PACKAGE@-@PACKAGE_VERSION@
+	cp -r @PACKAGE@-@PACKAGE_VERSION@.pkg @PACKAGE@-@PACKAGE_VERSION@
 	cp README NEWS @PACKAGE@-@PACKAGE_VERSION@
 	dropdmg -i --sanitize-for-servers --format zlib @PACKAGE@-@PACKAGE_VERSION@
 	-rm -rf @PACKAGE@-@PACKAGE_VERSION@
 
-pkg: clean-pkg pkg-build pkg-main pkg-dmg
+pkg: pkg-main
+
+
+
+
+
+
+
+
+
+
+
+
+
 

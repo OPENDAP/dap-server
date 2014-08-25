@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 
@@ -46,10 +46,11 @@ static char rcsid[] not_used =
 #endif
 
 #include <BaseType.h>
+#include <Grid.h>
 #include <DDS.h>
 
 #include <debug.h>
-#include <mime_util.h>
+#include <mime_util.h>	// remove if write_html_headers() not needed
 #include <util.h>
 
 #include "WWWOutput.h"
@@ -67,13 +68,16 @@ WWWOutput::WWWOutput(ostream &strm, int rows, int cols)
 {
 }
 
+// TODO: Can this be removed?
 void
 WWWOutput::write_html_header()
 {
+#if 1
     set_mime_html(*d_strm, unknown_type, dap_version(), x_plain);
+#endif
 }
 
-void WWWOutput::write_disposition(string url, bool FONc)
+void WWWOutput::write_disposition(string url, bool netcdf3_file_response, bool netcdf4_file_response)
 {
     // To get the size to be a function of the image window size, you need to
     // use some JavaScript code to generate the HTML. C++ --> JS --> HTML.
@@ -86,9 +90,12 @@ void WWWOutput::write_disposition(string url, bool FONc)
 <td>\n\
 <input type=\"button\" value=\"Get ASCII\" onclick=\"ascii_button()\">\n";
 
-    // Add new netcdf_button call here *** jhrg 2/9/09
-    if (FONc)
-	*d_strm << "<input type=\"button\" value=\"Get as NetCDF\" onclick=\"binary_button('nc')\">\n";
+    // Add new netcdf_button call here jhrg 2/9/09
+    if (netcdf3_file_response)
+    	*d_strm << "<input type=\"button\" value=\"Get as NetCDF 3\" onclick=\"binary_button('nc')\">\n";
+    // Add new new netcdf4 button. jhrg 9/23/13
+    if (netcdf4_file_response)
+    	*d_strm << "<input type=\"button\" value=\"Get as NetCDF 4\" onclick=\"binary_button('dap.nc4')\">\n";
 
     *d_strm <<
 "<input type=\"button\" value=\"Binary (DAP) Object\" onclick=\"binary_button('dods')\">\n\
@@ -100,7 +107,7 @@ void WWWOutput::write_disposition(string url, bool FONc)
 <td><input name=\"url\" type=\"text\" size=\"" << d_attr_cols << "\" value=\"" << url << "\">\n" ;
 }
 
-void WWWOutput::write_attributes(AttrTable * attr, const string prefix)
+void WWWOutput::write_attributes(AttrTable *attr, const string prefix)
 {
     if (attr) {
         for (AttrTable::Attr_iter a = attr->attr_begin(); a
@@ -156,29 +163,88 @@ void WWWOutput::write_variable_entries(DDS &dds)
 	(*p)->print_val(*d_strm);
 
         write_variable_attributes(*p);
-
+#if 0
+        (*p)->print_attributes(*d_strm, d_attr_rows, d_attr_cols);
+#endif
 	*d_strm << "\n<p><p>\n\n";  // End the current var's section
 	*d_strm << "<tr><td><td>\n\n";      // Start the next var in column two
     }
 }
 
-/** Write a variable's attribtute information.
+/** Write a variable's attribute information. This method is a jack because
+    this code does not use multiple inheritance and we'd need that to easily
+    add a new method to print attributes according to class. Here I just use
+    a switch stmt.
 
     @param btp A pointer to the variable.*/
 void WWWOutput::write_variable_attributes(BaseType * btp)
 {
-    AttrTable &attr = btp->get_attr_table();
+    switch (btp->type()) {
+    case dods_byte_c:
+    case dods_int16_c:
+    case dods_uint16_c:
+    case dods_int32_c:
+    case dods_uint32_c:
+    case dods_float32_c:
+    case dods_float64_c:
+    case dods_str_c:
+    case dods_url_c:
+    case dods_array_c: {
+	AttrTable &attr = btp->get_attr_table();
 
-    // Don't write anything if there are no attributes.
-    if (attr.get_size() == 0) {
-        DBG(cerr << "No Attributes for " << btp->name() << endl);
-        return;
+	// Don't write anything if there are no attributes.
+	if (attr.get_size() == 0) {
+	    DBG(cerr << "No Attributes for " << btp->name() << endl);
+	    return;
+	}
+
+	*d_strm << "<textarea name=\"" << btp->name() << "_attr\" rows=\"" << d_attr_rows << "\" cols=\""
+		<< d_attr_cols << "\">\n";
+	write_attributes(&attr);
+	*d_strm << "</textarea>\n\n";
+	break;
     }
 
-    *d_strm << "<textarea name=\"" << btp->name()
-	   << "_attr\" rows=\"" << d_attr_rows
-	   << "\" cols=\"" << d_attr_cols << "\">\n" ;
-    write_attributes(&attr);
-    *d_strm << "</textarea>\n\n" ;
+    case dods_structure_c:
+    case dods_sequence_c:  {
+	AttrTable &attr = btp->get_attr_table();
+
+	// Don't write anything if there are no attributes.
+	if (attr.get_size() == 0) {
+	    DBG(cerr << "No Attributes for " << btp->name() << endl);
+	    return;
+	}
+
+	*d_strm << "<textarea name=\"" << btp->name() << "_attr\" rows=\"" << d_attr_rows << "\" cols=\""
+		<< d_attr_cols << "\">\n";
+	write_attributes(&attr);
+	*d_strm << "</textarea>\n\n";
+	break;
+    }
+
+    case dods_grid_c: {
+	Grid &g = dynamic_cast<Grid&>(*btp);
+#if 0
+	// Don't write anything if there are no attributes.
+	if (attr.get_size() == 0 && array_attr.get_size() == 0) {
+	    DBG(cerr << "No Attributes for " << btp->name() << endl);
+	    return;
+	}
+#endif
+	*d_strm << "<textarea name=\"" << btp->name() << "_attr\" rows=\"" << d_attr_rows << "\" cols=\""
+		<< d_attr_cols << "\">\n";
+	write_attributes(&g.get_attr_table());
+	write_attributes(&g.get_array()->get_attr_table(), g.name());
+	for (Grid::Map_iter m = g.map_begin(); m != g.map_end(); ++m) {
+	    Array &map = dynamic_cast<Array&>(**m);
+	    write_attributes(&map.get_attr_table(), map.name());
+	}
+	*d_strm << "</textarea>\n\n";
+	break;
+    }
+
+    default:
+	break;
+    }
 }
 

@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 
@@ -69,4 +69,16 @@ WWWInt32::print_val(ostream &strm, string, bool /*print_decl_p*/)
 {
     write_simple_variable(strm, this);
 }
+#if 0
+void
+WWWInt32::print_attributes(FILE *os)
+{
+    write_simple_var_attributes(os, this);
+}
 
+void
+WWWInt32::print_attributes(ostream &os, int rows, int cols)
+{
+    write_simple_var_attributes(os, rows, cols, this);
+}
+#endif

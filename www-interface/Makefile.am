@@ -11,7 +11,7 @@ AM_CPPFLAGS = -I$(top_srcdir) $(BES_CPPFLAGS)
 
 # These are not used by automak but are often useful for certain types of
 # debugging.
-CXXFLAGS_DEBUG = -g3 -O0 -Wall -fno-defer-pop
+CXXFLAGS_DEBUG = -g3 -O0 -Wall 
 TEST_COV_FLAGS = -ftest-coverage -fprofile-arcs
 
 lib_besdir=$(libdir)/bes

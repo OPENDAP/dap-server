@@ -1,15 +1,18 @@
 Summary:         Basic request handling for OPeNDAP servers 
 Name:            dap-server
-Version:         3.9.3
+Version:         4.1.5
 Release:         1
 License:         LGPL
 Group:           System Environment/Daemons 
 Source0:         http://www.opendap.org/pub/source/%{name}-%{version}.tar.gz
 URL:             http://www.opendap.org/
+Requires:        libdap >= 3.13.0
+Requires:        bes >= 3.13.0
 
 BuildRoot:       %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:   libdap-devel >= 3.9.1
-BuildRequires:   bes-devel >= 3.7.1
+
+BuildRequires:   libdap-devel >= 3.13.0
+BuildRequires:   bes-devel >= 3.13.0
 
 %description
 This package contains general purpose handlers for use with the new
@@ -28,17 +31,18 @@ make %{?_smp_mflags}
 rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install INSTALL='install -p'
 
-rm $RPM_BUILD_ROOT%{_libdir}/*.la
-rm $RPM_BUILD_ROOT%{_libdir}/*.so
-rm $RPM_BUILD_ROOT%{_libdir}/bes/*.la
+rm $RPM_BUILD_ROOT%{_libdir}/bes/libascii_module.la
+rm $RPM_BUILD_ROOT%{_libdir}/bes/libusage_module.la
+rm $RPM_BUILD_ROOT%{_libdir}/bes/libwww_module.la
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc __dist_doc/*
-%{_bindir}/bes-dap-data.sh
+%dir %{_sysconfdir}/bes
+%dir %{_sysconfdir}/bes/modules
+%config(noreplace) %{_sysconfdir}/bes/modules/dap-server.conf
 %{_datadir}/bes/
 %{_libdir}/bes/libascii_module.so
 %{_libdir}/bes/libusage_module.so

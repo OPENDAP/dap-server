@@ -2,7 +2,7 @@
 #
 # use "i386" or "ppc.*" - nake sure to use a regex for PPC!
 
-PATH="/Users/jimg/src/hyrax_1.8_release/bin:$PATH"
+PATH="_PREFIX_/bin:$PATH"
 
 
 architecture="i386.*"

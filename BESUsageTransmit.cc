@@ -18,7 +18,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // You can contact University Corporation for Atmospheric Research at
 // 3080 Center Green Drive, Boulder, CO 80301
@@ -31,15 +31,17 @@
 //      jgarcia     Jose Garcia <jgarcia@ucar.edu>
 
 #include "BESDapTransmit.h"
+#if 0
 #include "DODSFilter.h"
+#endif
 #include "BESUsageTransmit.h"
-#include "DODSFilter.h"
+// #include "DODSFilter.h"
 #include "BESContainer.h"
 #include "BESDataNames.h"
 #include "mime_util.h"
 #include "BESUsage.h"
 #include "usage.h"
-#include "util.h"
+//#include "util.h"
 #include "InternalErr.h"
 #include "BESDapError.h"
 #include "BESInternalFatalError.h"
@@ -88,7 +90,8 @@ void
 BESUsageTransmit::send_http_usage( BESResponseObject *obj,
                                    BESDataHandlerInterface &dhi )
 {
-    set_mime_text( dhi.get_output_stream(), unknown_type ) ;
+    // TODO: Is this used?
+    set_mime_html( dhi.get_output_stream(), unknown_type, x_plain ) ;
     BESUsageTransmit::send_basic_usage( obj, dhi ) ;
 }
 

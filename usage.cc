@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 
@@ -64,7 +64,7 @@ static char rcsid[] not_used = {"$Id$"};
 #include <Ancillary.h>
 
 #include <DAS.h>
-#include <mime_util.h>
+//#include <mime_util.h>
 #include <util.h>
 
 #include <debug.h>
@@ -451,10 +451,12 @@ write_usage_response(ostream &strm, DDS &dds, DAS &das,
 	if( httpheader )
 	    html_header( strm );
 
-        if (global_attrs.length()) {
-	    strm << "<html><head><title>Dataset Information</title></head>"
-	         << "\n" << "<body>" << "\n" << global_attrs.c_str()
-		 << "\n" << "<hr>" << "\n" ;
+	strm << "<html><head><title>Dataset Information</title></head>"
+	     << "\n" << "<body>" << "\n" ;
+
+        if (global_attrs.length())
+	{
+	    strm << global_attrs.c_str() << "\n" << "<hr>" << "\n" ;
         }
 
         strm << variable_sum.c_str() << "\n" ;

@@ -19,7 +19,7 @@
 // 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 
@@ -43,7 +43,7 @@ using namespace libdap ;
 class WWWInt32: public Int32 {
 public:
     WWWInt32(const string &n);
-    WWWInt32( Int32 *bt ) : Int32( bt->name() ) {}
+    WWWInt32( Int32 *bt ) : Int32( *bt ) {}
     virtual ~WWWInt32() {}
 
     virtual BaseType *ptr_duplicate();
@@ -52,6 +52,10 @@ public:
 			   bool print_decl_p = true);
     virtual void print_val(ostream &strm, string space = "", 
 			   bool print_decl_p = true);
+#if 0
+    //virtual void print_attributes(FILE *os);
+    virtual void print_attributes(ostream &os, int rows, int cols);
+#endif
 };
 
 #endif

@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 
@@ -56,13 +56,14 @@ BaseType *WWWArray::ptr_duplicate()
     return new WWWArray(*this);
 }
 
-WWWArray::WWWArray(const string & n, BaseType * v):Array(n, v), _redirect(0)
+WWWArray::WWWArray(const string & n, BaseType * v): Array(n, v), _redirect(0)
 {
 }
 
 WWWArray::WWWArray(Array * bt) : Array( bt->name(), 0), _redirect(bt)
 {
     BaseType *abt = basetype_to_wwwtype(bt->var());
+    abt->set_attr_table(bt->get_attr_table());
     add_var(abt);
     // add_var makes a copy of the base type passed to it, so delete it here
     delete abt;

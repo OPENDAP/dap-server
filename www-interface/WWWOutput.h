@@ -19,7 +19,7 @@
 //
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 
@@ -76,15 +76,17 @@ private:
     WWWOutput(ostream &strm, int rows = 5, int cols = 70);
 
     /** Write out the header for the HTML document. */
+#if 1
+    // TODO: Can this be removed?
     void write_html_header();
-
+#endif
     /** Write the disposition section of the HTML page. This section shows
 	the URL and provides buttons with which the user can choose the type
 	of output.
 
 	@param url The initial URL to display.
 	@param FONc True if the Fileout netCDF button should be shown. */
-    void write_disposition(string url, bool FONc);
+    void write_disposition(string url, bool netcdf3_file_response, bool netcdf4_file_response);
 
     void write_global_attributes(AttrTable &attr);
 

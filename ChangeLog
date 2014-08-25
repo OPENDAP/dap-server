@@ -1,3 +1,588 @@
+2014-07-31  James Gallagher <jgallagher@opendap.org>
+
+	Cleaned up some of the error messages
+
+2014-07-30  James Gallagher <jgallagher@opendap.org>
+
+	Fix a leak where eval_function_clauses() was called and the original
+	DataDDS was not deleted before setting the new DataDDS in the BES
+	Response object.
+
+	M    asciival/BESAsciiTransmit.cc
+
+2014-07-30  James Gallagher <jgallagher@opendap.org>
+
+	I added a comment about a potential memory leak to BESAsciiTransmit.cc
+
+2014-04-22  James Gallagher <jgallagher@opendap.org>
+
+	Updated for 4.1.4
+
+	M    ChangeLog
+	M    INSTALL
+	M    NEWS
+	M    README
+	M    configure.ac
+	M    dap-server.spec
+
+2014-03-26  James Gallagher <jgallagher@opendap.org>
+
+	Fixed namepace libdap.
+
+	M    asciival/get_ascii.h
+
+2014-03-26  James Gallagher <jgallagher@opendap.org>
+
+	Fixed namepace libdap.
+
+	M    asciival/get_ascii.h
+
+2013-10-01  James Gallagher <jgallagher@opendap.org>
+
+	Updated the FSF address in the copyright headers
+
+2013-09-26  James Gallagher <jgallagher@opendap.org>
+
+	removed -fno-defer-pop from all copies of Makefile.am since the
+	new OSX compiler prints warnings about it and it seems to not make
+	a difference with newer g++ versions.
+
+2013-09-25  James Gallagher <jgallagher@opendap.org>
+
+	Modified the web form so that it has a button for netcdf 3 and netcdf 4
+	file responses.
+
+	M    www-interface/BESWWWTransmit.cc
+	M    www-interface/WWWOutput.cc
+	M    www-interface/WWWOutput.h
+	M    www-interface/get_html_form.cc
+	M    www-interface/get_html_form.h
+
+2013-08-28  Nathan Potter <ndp@coas.oregonstate.edu>
+
+	dap-server: Updating version number, changelog, etc. for pending Hyrax 1.9 release
+
+2013-05-20  James Gallagher <jgallagher@opendap.org>
+
+	Added an explicit encoding type so that the set_mime_*() functions
+	could differentiate between the new code moved to mime_util.cc/.h
+	from ResponseBuilder and the old, deprecated, code already in
+	mime_util.
+
+2013-01-22  James Gallagher <jgallagher@opendap.org>
+
+	Minor tweaks from the merge.
+
+	M    asciival/AsciiSequence.cc
+	M    asciival/AsciiSequence.h
+
+2013-01-20  James Gallagher <jgallagher@opendap.org>
+
+	Merge of the hyrax 1.8 release branch.
+
+	_M   .
+	_M   www-interface
+	_M   conf
+	_M   asciival
+	M    asciival/BESAsciiTransmit.cc
+	M    asciival/BESAsciiModule.cc
+	M    asciival/BESAsciiRequestHandler.cc
+	_M   asciival/unit-tests
+	M    asciival/unit-tests/test_config.h.in
+	M    asciival/unit-tests/Makefile.am
+	M    asciival/unit-tests/testsuite/AsciiOutputTest1.dds
+	M    asciival/unit-tests/AsciiArrayTest.cc
+	M    asciival/unit-tests/AsciiOutputTest.cc
+	M    asciival/BESAsciiResponseHandler.cc
+	M    configure.ac
+	M    INSTALL
+	M    NEWS
+	M    ChangeLog
+	M    README
+	M    dap-server.spec
+	_M   OSX_Resources
+	M    OSX_Resources/InstallationCheck
+	M    OSX_Resources/ReadMe.txt
+
+2012-04-13  James Gallagher <jgallagher@opendap.org>
+
+	After merge with hyrax 1.8 release branch and full build w/o test failures.
+
+	M    ChangeLog
+
+;; Local Variables:
+;; coding: utf-8
+;; End:
+2012-01-09  James Gallagher <jgallagher@opendap.org>
+
+	Code review.
+
+2011-10-29  James Gallagher <jgallagher@opendap.org>
+
+	Fixed distcheck - made asciival/unit-tests/test_config.h use the
+	abs_srcdir and also moved its generation into configure.ac. With
+	that change the dependency on Makefile is lost, but so is the
+	special-case hack in Makefile.am.
+
+	M    asciival/unit-tests/test_config.h.in
+	M    asciival/unit-tests/Makefile.am
+	M    asciival/unit-tests/AsciiArrayTest.cc
+	M    configure.ac
+	M    OSX_Resources/InstallationCheck
+	M    OSX_Resources/ReadMe.txt
+
+2011-10-26  James Gallagher <jgallagher@opendap.org>
+
+	Updates for the new DDX tests... nearly done
+
+2011-10-23  James Gallagher <jgallagher@opendap.org>
+
+	Modified configure so that this code builds only the so version of the library by default.
+
+2011-09-21  James Gallagher <jgallagher@opendap.org>
+
+	Hyrax 1.8
+
+	A    http://scm.opendap.org/svn/branch/dap-server/4.1.2
+
+2011-06-30  Patrick West <pwest@ucar.edu>
+
+	Merge hyrax 1.7 branch to trunk
+
+2011-04-25  Patrick West <pwest@ucar.edu>
+
+	The html, head, and beginning body tag were not being printed. Also, the
+	mime type was being set to text/plain.
+	M    usage.cc
+	M    BESUsageTransmit.cc
+
+2011-04-20  James Gallagher <jgallagher@opendap.org>
+
+	metapackage build
+
+	M    OSX_Resources/InstallationCheck
+
+2011-04-20  James Gallagher <jgallagher@opendap.org>
+
+	Hyrax 1.7 releaseHyrax 1.7 release
+
+2011-04-20  James Gallagher <jgallagher@opendap.org>
+
+	metapackage build
+
+	M    OSX_Resources/InstallationCheck
+
+2011-04-11  James Gallagher <jgallagher@opendap.org>
+
+	build change
+
+	M    OSX_Resources/InstallationCheck
+
+2011-04-08  James Gallagher <jgallagher@opendap.org>
+
+	Build fixes for	h 1.7 osx meta package
+
+	M    OSX_Resources/InstallationCheck
+
+2011-03-24  Nathan Potter <ndp@coas.oregonstate.edu>
+
+2011-03-17  Nathan Potter <ndp@coas.oregonstate.edu>
+
+2011-03-17  Nathan Potter <ndp@coas.oregonstate.edu>
+
+	dap-server: Added automated version numbers to OSX Package builds
+
+2011-03-08  James Gallagher <jgallagher@opendap.org>
+
+	Merge for hyrax	1.7 from the hyrax_1.6.2_release branch	of shrew to the	trunk
+
+	_M   .
+	A  + OSX_Resources/InstallationCheck.proto
+	M    OSX_Resources/update_mac_package_contents.pl
+	A  + OSX_Resources/Info.plist.proto
+	M    Makefile.am
+
+2011-02-08  James Gallagher <jgallagher@opendap.org>
+
+	removed unneeded mime_util.h and util.h includes; added comments about sending mime headers in our handlers (which may not be needed).
+
+2010-10-28  mjohnson
+
+	Merge from the Hyrax 1.6.2 Shrew Release branch.
+
+2010-09-14  James Gallagher <jgallagher@opendap.org>
+
+	Bumped bes version to 3.9.0 to handle issues with the conf files.
+
+	M    configure.ac
+
+2010-09-14  James Gallagher <jgallagher@opendap.org>
+
+	Mminor fix to configure - this can still use bes 3.8.3 but requires functions added to libdap 3.11.0.
+
+2010-09-14  James Gallagher <jgallagher@opendap.org>
+
+	Updated for version 4.1
+
+	M    configure.ac
+	M    INSTALL
+	M    NEWS
+	M    ChangeLog
+	M    README
+	M    dap-server.spec
+
+2010-09-14  James Gallagher <jgallagher@opendap.org>
+
+	This code now uses the new method in ConstraintEvaluator that enables multiple functions to be called.
+
+2010-09-14  James Gallagher <jgallagher@opendap.org>
+
+	This code now uses the new method in ConstraintEvaluator that
+	enables multiple functions to be called.
+
+2010-09-03  James Gallagher <jgallagher@opendap.org>
+
+	Grids have attributes again! I added the map vector attributes, too.
+
+2010-08-13  James Gallagher <jgallagher@opendap.org>
+
+	Fixed PERL which this code needs to build the javascript.h file.
+
+2010-07-16  James Gallagher <jgallagher@opendap.org>
+
+	Removed test for Perl - we don't use Perl in this code anymore.
+
+2010-07-15  Patrick West <pwest@ucar.edu>
+
+	Added include of dependent dap.conf
+
+2010-05-12  James Gallagher <jgallagher@opendap.org>
+
+	Merged Hyrax 1.6.1
+
+	_M   .
+	M    conf/libdap.m4
+	M    ais-tool/conf/libdap.m4
+	M    configure.ac
+	M    INSTALL
+	M    NEWS
+	M    ChangeLog
+	M    README
+	M    dap-server.spec
+	M    Makefile.am
+
+2010-04-22  Patrick West <pwest@ucar.edu>
+
+	Fixed issue with dap-config --version with b at end (for beta)
+	M    conf/libdap.m4
+
+2010-04-15  James Gallagher <jgallagher@opendap.org>
+
+	Added a dist-hook target that removes .svn dirs from the dist tar.
+
+	M    dap-server/Makefile.am
+	M    fileout_netcdf/Makefile.am
+	M    freeform_handler/Makefile.am
+	M    hdf4_handler/Makefile.am
+	M    hdf5_handler/Makefile.am
+	M    ncml_module/Makefile.am
+	M    netcdf_handler/Makefile.am
+
+2010-04-15  James Gallagher <jgallagher@opendap.org>
+
+	Added Requires: lines to the .spec files for all the modules we build rpms for.
+
+2010-03-29  Patrick West <pwest@ucar.edu>
+
+	+= for modules
+	M    dap-server.conf.in
+
+2010-02-05  Patrick West <pwest@ucar.edu>
+
+	Version requirements for libdap and bes updated. removed docs
+	requirement in spec file. Removing only dap-server .la files in the spec
+	file. Was doing *.la.
+	M    configure.ac
+	M    dap-server.spec
+
+2010-02-03  rduncan
+
+	Release 4.0
+
+2010-02-02  James Gallagher <jgallagher@opendap.org>
+
+	Spec file version number changes
+
+2010-02-02  James Gallagher <jgallagher@opendap.org>
+
+	Fixed the versions to match the value in configure
+
+	M    INSTALL
+	M    NEWS
+	M    README
+
+2010-02-01  James Gallagher <jgallagher@opendap.org>
+
+	Updated for Hyrax 1.6
+
+	M    INSTALL
+
+2010-02-01  James Gallagher <jgallagher@opendap.org>
+
+	Updated for version 4.0
+
+	M    INSTALL
+	M    NEWS
+	M    ChangeLog
+	M    README
+
+2010-02-01  rduncan
+
+	Release 02/01/2010 4.0
+
+2010-02-01  rduncan
+
+	Release 02/01/2010 4.0
+
+2010-02-01  rduncan
+
+	Release 02/01/2010
+
+2010-02-01  rduncan
+
+	Release 1/01/2010
+
+;; Local Variables:
+;; coding: utf-8
+;; End:
+2010-02-01  rduncan
+
+	Release 1/01/2010
+
+2010-01-22  Patrick West <pwest@ucar.edu>
+
+	Make sure the etc/bes directory is created before etc/bes/modules
+	M    dap-server.spec
+
+2010-01-11  Patrick West <pwest@ucar.edu>
+
+	Using correct conf file name
+	M    dap-server.spec
+
+2010-01-11  Patrick West <pwest@ucar.edu>
+
+	Removing the correct conf files
+	M    Makefile.am
+
+2010-01-11  Patrick West <pwest@ucar.edu>
+
+	No longer using this script
+	D    bes-dap-data.sh.in
+
+2010-01-11  Patrick West <pwest@ucar.edu>
+
+	dap-server.conf added to modules directory of BES configuration
+	A    dap-server.conf.in
+	M    dap-server.spec
+	M    Makefile.am
+
+2010-01-08  Patrick West <pwest@ucar.edu>
+
+	--clean to clean build and src files for rpmbuild
+	M    Makefile.am
+
+2009-12-29  James Gallagher <jgallagher@opendap.org>
+
+	Shrew build changes that will hopefully lead to a version that we
+	can build using NMI's B&T system. Also, I added 'cccc' targets so
+	that we can take a 'metrics snapshot' without undue pain.
+
+2009-11-23  James Gallagher <jgallagher@opendap.org>
+
+	I removed the calls that request a DAS since all of our current
+	handlers return a DDS that is loaded with attributes (so the DAS
+	is redundant). This should fix the problem when using the ncml
+	handler (which cannot build a DAS). To make this work I had to fix
+	the way the variables are copied/transformed by the handler so the
+	transformation operation copied the variables' attribute tables
+	too. A different way to write this handler would be to subclass
+	DDS and have that new DDS use a base type factory class. However,
+	the problem with that is libdap copies the variables contained by
+	constructor types but does not use a factory (neither does DDS,
+	but since DDS has an instance of the factory that could be
+	changed).
+
+2009-11-05  James Gallagher <jgallagher@opendap.org>
+
+	Tweaked the FILE_METHODS define given the change in libdap - that
+	symbol is now defined in the header files and not in the cc and
+	config.h files.
+
+2009-10-02  Patrick West <pwest@ucar.edu>
+
+	Removed functions that use FILE pointers.
+	M    www-interface/WWWOutput.cc
+	M    www-interface/WWWOutput.h
+	M    usage.cc
+	M    usage.h
+
+2009-09-11  Patrick West <pwest@ucar.edu>
+
+	usage_main.cc renamed to usage.cc
+	M    configure.ac
+
+2009-09-04  Patrick West <pwest@ucar.edu>
+
+	Removed Server 3 code and files. Removed asciival/testsuite as it is no
+	longer used.
+	D    dap-server.rc.in
+	D    www-interface/www_int.cc
+	M    www-interface/Makefile.am
+	D    DODS_Dispatch.pm
+	D    DODS_Cache.pm
+	D    asciival/ascii_val.cc
+	M    asciival/unit-tests/Makefile.am
+	D    asciival/testsuite
+	M    asciival/Makefile.am
+	M    configure.ac
+	D    dods_logging.pm
+	D    opendap_apache.conf
+	D    nph-dods.in
+	D    FilterDirHTML.pm
+	D    usage_main.cc
+	M    README
+	M    dap-server.spec
+	M    Makefile.am
+	D    EXAMPLE_OPENDAP_STATISTICS
+	D    read_config.pm
+
+2009-09-02  James Gallagher <jgallagher@opendap.org>
+
+	Added MACRO_DIR to configure.ac; Changes for libdap.
+
+	M    ais-tool/ais_tool.cc
+	M    usage.cc
+	M    asciival/ascii_val.cc
+	M    configure.ac
+	M    BESUsageTransmit.cc
+	M    usage_main.cc
+
+2009-08-31  Patrick West <pwest@ucar.edu>
+
+	changed include of cgi_util to mime_util and removed include where
+	not needed
+
+2009-08-23  Patrick West <pwest@ucar.edu>
+
+	Added ; after each BESDEBUG statement
+
+2009-08-19  James Gallagher <jgallagher@opendap.org>
+
+	Deleted generated files
+
+2009-08-18  Patrick West <pwest@ucar.edu>
+
+	DAP Macro changes
+
+2009-07-13  Patrick West <pwest@ucar.edu>
+
+	Merged hyrax 1.5.2 tag to the trunk. Repaired the module classes
+	removing the transmit methods for dap2 format.
+	_M   .
+	M    www-interface/BESWWWModule.cc
+	A  + conf/cppunit.m4
+	M    asciival/AsciiGrid.h
+	M    asciival/BESAsciiTransmit.cc
+	M    asciival/AsciiStructure.cc
+	M    asciival/AsciiOutput.cc
+	M    asciival/AsciiInt32.h
+	M    asciival/AsciiStructure.h
+	M    asciival/AsciiOutput.h
+	M    asciival/AsciiInt16.h
+	M    asciival/AsciiUrl.h
+	M    asciival/AsciiByte.h
+	M    asciival/AsciiStr.h
+	M    asciival/BESAsciiModule.cc
+	M    asciival/ascii_val.cc
+	M    asciival/AsciiFloat64.h
+	A  + asciival/unit-tests/test_config.h.in
+	M    asciival/unit-tests/Makefile.am
+	M    asciival/unit-tests/AsciiArrayTest.cc
+	M    asciival/unit-tests/AsciiOutputTest.cc
+	M    asciival/AsciiGrid.cc
+	M    asciival/AsciiUInt32.h
+	M    asciival/AsciiUInt16.h
+	M    asciival/AsciiSequence.cc
+	M    asciival/AsciiSequence.h
+	M    asciival/AsciiFloat32.h
+	M    asciival/Makefile.am
+	M    asciival/AsciiArray.cc
+	M    asciival/get_ascii.cc
+	M    asciival/AsciiArray.h
+	M    asciival/get_ascii.h
+	M    configure.ac
+	M    INSTALL
+	M    NEWS
+	M    BESUsageModule.cc
+	M    README
+	M    dap-server.spec
+
+2009-04-08  James Gallagher <jgallagher@opendap.org>
+
+	Merged with tagged version 3.9.2
+
+	_M   .
+	M    www-interface/www_int.cc
+	M    www-interface/BESWWWTransmit.cc
+	M    www-interface/BESWWWNames.h
+	M    www-interface/WWWOutput.cc
+	M    www-interface/WWWOutput.h
+	M    www-interface/BESWWWModule.cc
+	M    www-interface/BESWWWRequestHandler.cc
+	M    www-interface/get_html_form.cc
+	M    www-interface/BESWWWRequestHandler.h
+	M    www-interface/WWWGrid.cc
+	M    www-interface/BESWWWResponseHandler.cc
+	M    www-interface/BESWWWResponseHandler.h
+	M    www-interface/BESWWWTransmit.h
+	M    www-interface/www.js
+	M    www-interface/BESWWWGetCommand.cc
+	M    www-interface/BESWWWGetCommand.h
+	M    www-interface/BESWWW.h
+	M    www-interface/Makefile.am
+	M    www-interface/BESWWWModule.h
+	M    www-interface/get_html_form.h
+	M    dap-server_help.html
+	M    BESUsage.h
+	M    BESUsageModule.h
+	M    asciival/BESAsciiTransmit.cc
+	M    asciival/BESAsciiNames.h
+	M    asciival/BESAsciiModule.cc
+	M    asciival/BESAsciiRequestHandler.cc
+	M    asciival/ascii_val.cc
+	M    asciival/BESAsciiRequestHandler.h
+	M    asciival/AsciiGrid.cc
+	M    asciival/BESAsciiResponseHandler.cc
+	M    asciival/BESAsciiResponseHandler.h
+	M    asciival/BESAsciiTransmit.h
+	M    asciival/AsciiArray.cc
+	M    asciival/BESAsciiModule.h
+	M    configure.ac
+	M    BESUsageTransmit.cc
+	M    INSTALL
+	M    BESUsageNames.h
+	M    NEWS
+	M    ChangeLog
+	M    BESUsageModule.cc
+	M    BESUsageRequestHandler.cc
+	M    BESUsageRequestHandler.h
+	M    README
+	M    dap-server_help.txt
+	M    BESUsageResponseHandler.cc
+	M    dap-server.spec
+	M    BESUsageResponseHandler.h
+	M    BESUsageTransmit.h
+
 2009-03-16  James Gallagher <jgallagher@opendap.org>
 
 	Results of a code review.
