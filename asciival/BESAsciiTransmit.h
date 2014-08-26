@@ -51,6 +51,7 @@ public:
     }
 
     static void		send_basic_ascii( BESResponseObject *obj, BESDataHandlerInterface &dhi ) ;
+    static void		send_dap4_csv( BESResponseObject *obj, BESDataHandlerInterface &dhi ) ;
     static void		send_http_ascii( BESResponseObject *obj, BESDataHandlerInterface &dhi ) ;
 } ;
 
