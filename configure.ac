@@ -2,7 +2,7 @@
 dnl -*- autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.59)
+AC_PREREQ(2.69)
 AC_INIT(dap-server, 4.1.5, opendap-tech@opendap.org)
 AC_CONFIG_AUX_DIR([conf])
 AC_CONFIG_MACRO_DIR([conf])
@@ -14,12 +14,14 @@ AM_INIT_AUTOMAKE(1.10)
 # which can make running unit tests with valgrind far more pleasant. 
 AM_DISABLE_STATIC
 
+AC_CONFIG_TESTDIR(asciival/tests, [.])
+
 AC_CONFIG_SRCDIR([usage.cc])
 AM_CONFIG_HEADER([config.h])
 
+
 AC_DEFINE([DAP_PROTOCOL_VERSION], ["3.2"], [What DAP version is supported?])
 AC_SUBST([DAP_PROTOCOL_VERSION])
-
 
 PACKAGE_MAJOR_VERSION=`echo $PACKAGE_VERSION | sed 's@^\([[0-9]]\)*\.\([[0-9]]*\)\.\([[0-9]]*\)$@\1@'`
 PACKAGE_MINOR_VERSION=`echo $PACKAGE_VERSION | sed 's@^\([[0-9]]\)*\.\([[0-9]]*\)\.\([[0-9]]*\)$@\2@'`
@@ -33,7 +35,7 @@ AC_SUBST(PACKAGE_SUBMINOR_VERSION)
 
 
 dnl flags for the compilers and linkers - set these before locating the
-dnl actual tools since some of the AC_PROG macros set these `flag variables'
+dnl actual tools since some of the AC_PROG macros set these 'flag variables'
 dnl to default values otherwise.
 
 AC_CANONICAL_HOST
@@ -48,7 +50,7 @@ AC_PROG_LIBTOOL
 
 dnl Perl is  used by www-interface during the build
 dnl DODS_PROG_PERL
-AC_CHECK_PROG([PERL], [perl], [`which perl`])
+AC_CHECK_PROG([PERL], [perl], [/usr/bin/perl])
 
 dods_HTML_Filter=no
 if $PERL -e "use HTML::Filter;" > /dev/null 2>&1; then 
@@ -140,7 +142,7 @@ dnl autoheader macros; tack some text at the top and bottom of config.h.in
 AH_TOP([#ifndef _config_h
 #define _config_h])
 
-AH_BOTTOM([/* Shorthand for gcc's unused attribute feature */
+AH_BOTTOM([/* Shorthand for gccs unused attribute feature */
 #if defined(__GNUG__) || defined(__GNUC__)
 #define not_used __attribute__ ((unused))
 #else
@@ -150,9 +152,9 @@ AH_BOTTOM([/* Shorthand for gcc's unused attribute feature */
 #endif /* _config_h */])
 
 AC_CONFIG_FILES([Makefile
-                 asciival/Makefile
-		 asciival/unit-tests/Makefile
-		 asciival/unit-tests/test_config.h
+                 asciival/Makefile 
+                 asciival/unit-tests/Makefile asciival/unit-tests/test_config.h 
+                 asciival/tests/Makefile asciival/tests/package.m4 asciival/tests/atlocal
                  www-interface/Makefile])
                  
 AC_CONFIG_FILES([www-interface/js2h.pl], [chmod +x www-interface/js2h.pl])
