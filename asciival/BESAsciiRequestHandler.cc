@@ -10,12 +10,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// 
+//
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -53,20 +53,6 @@ bool BESAsciiRequestHandler::dap_build_help(BESDataHandlerInterface &dhi)
     // the usage request handler is already loading this and, since all
     // three dap-server modules are usually loaded, we'll assume it's
     // already taken care of
-    /*
-     BESResponseObject *response = dhi.response_handler->get_response_object() ;
-     BESInfo *info = dynamic_cast < BESInfo * >(response) ;
-     if( !info )
-     throw BESInternalError( "cast error", __FILE__, __LINE__ ) ;
-
-     map<string,string> attrs ;
-     string name = (string)PACKAGE_NAME + "/ascii" ;
-     attrs["name"] = name ;
-     attrs["version"] = PACKAGE_VERSION ;
-     info->begin_tag( "module", &attrs ) ;
-     info->add_data_from_file( "DAP-SERVER.Help", "Dap server Help" ) ;
-     info->end_tag( "module" ) ;
-     */
 
     return true;
 }

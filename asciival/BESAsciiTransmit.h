@@ -10,19 +10,19 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// 
+//
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // You can contact University Corporation for Atmospheric Research at
 // 3080 Center Green Drive, Boulder, CO 80301
- 
+
 // (c) COPYRIGHT University Corporation for Atmospheric Research 2004-2005
 // Please read the full copyright statement in the file COPYRIGHT_UCAR.
 //
@@ -33,28 +33,24 @@
 #ifndef I_BESAsciiTransmit_h
 #define I_BESAsciiTransmit_h 1
 
-#include <BESDataHandlerInterface.h>
 #include <BESBasicTransmitter.h>
 
-class BESContainer;
-class BESResponseObject ;
+class BESResponseObject;
+class BESDataHandlerInterface;
 
 #define ASCII_TRANSMITTER "ascii"
 #define DAP4_CSV_TRANSMITTER "csv"
 
-class BESAsciiTransmit: public BESBasicTransmitter
-{
+class BESAsciiTransmit: public BESBasicTransmitter {
 public:
 	BESAsciiTransmit();
-    virtual ~BESAsciiTransmit()
-    {
-    }
+	virtual ~BESAsciiTransmit()
+	{
+	}
 
-    static void		send_basic_ascii( BESResponseObject *obj, BESDataHandlerInterface &dhi ) ;
-    static void		send_dap4_csv( BESResponseObject *obj, BESDataHandlerInterface &dhi ) ;
-    static void		send_http_ascii( BESResponseObject *obj, BESDataHandlerInterface &dhi ) ;
-} ;
-
+	static void send_basic_ascii(BESResponseObject *obj, BESDataHandlerInterface &dhi);
+	static void send_dap4_csv(BESResponseObject *obj, BESDataHandlerInterface &dhi);
+};
 
 #endif // I_BESAsciiTransmit_h
 

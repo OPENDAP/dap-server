@@ -13,7 +13,7 @@ AM_CPPFLAGS = -I$(top_srcdir)
 CXXFLAGS_DEBUG = -g3 -O0 -Wall 
 TEST_COV_FLAGS = -ftest-coverage -fprofile-arcs
 
-SUBDIRS = unit-tests
+SUBDIRS = . unit-tests tests
 
 lib_besdir=$(libdir)/bes
 lib_bes_LTLIBRARIES = libascii_module.la
@@ -31,13 +31,12 @@ ASCII_SOURCES = AsciiArray.cc AsciiInt16.cc AsciiStructure.cc		   \
 		AsciiUrl.h AsciiFloat32.h AsciiSequence.h AsciiFloat64.h   \
 		AsciiStr.h AsciiGrid.h AsciiStructure.h AsciiInt16.h	   \
 		AsciiUInt16.h AsciiOutputFactory.cc AsciiOutputFactory.h   \
-		get_ascii.cc get_ascii.h
+		get_ascii.cc get_ascii.h get_ascii_dap4.cc get_ascii_dap4.h
 
-BES_SOURCES = BESAsciiModule.cc BESAsciiResponseHandler.cc		   \
-	      BESAsciiTransmit.cc BESAsciiRequestHandler.cc		   \
-	      BESAsciiModule.h BESAsciiResponseHandler.h		   \
-	      BESAsciiTransmit.h BESAsciiRequestHandler.h BESAsciiNames.h
+BES_SOURCES = BESAsciiModule.cc BESAsciiTransmit.cc BESAsciiRequestHandler.cc \
+	    BESAsciiModule.h BESAsciiTransmit.h BESAsciiRequestHandler.h BESAsciiNames.h
 
+# BESAsciiResponseHandler.cc BESAsciiResponseHandler.h
 EXTRA_DIST = 
 
 CLEANFILES = *~ *.log *.sum

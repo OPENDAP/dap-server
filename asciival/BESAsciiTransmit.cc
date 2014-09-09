@@ -30,9 +30,15 @@
 //      pwest       Patrick West <pwest@ucar.edu>
 //      jgarcia     Jose Garcia <jgarcia@ucar.edu>
 
+#include <memory>
+
 #include <BaseType.h>
 #include <Sequence.h>
 #include <ConstraintEvaluator.h>
+#include <D4Group.h>
+#include <DMR.h>
+#include <D4CEDriver.h>
+#include <crc.h>
 #include <InternalErr.h>
 #include <util.h>
 #include <escaping.h>
@@ -43,6 +49,7 @@
 #include <BESDapTransmit.h>
 #include <BESContainer.h>
 #include <BESDataDDSResponse.h>
+#include <BESDMRResponse.h>
 #include <BESDapError.h>
 #include <BESInternalFatalError.h>
 
@@ -50,21 +57,18 @@
 
 #include "BESAsciiTransmit.h"
 #include "get_ascii.h"
+#include "get_ascii_dap4.h"
 
 using namespace dap_asciival;
-
-
-
 
 BESAsciiTransmit::BESAsciiTransmit() : BESBasicTransmitter() {
 
 	add_method(DATA_SERVICE, BESAsciiTransmit::send_basic_ascii);
-    add_method(DAP4DATA_SERVICE,  BESAsciiTransmit::send_dap4_csv);
+    add_method(DAP4DATA_SERVICE, BESAsciiTransmit::send_dap4_csv);
 
 }
 
-
-void BESAsciiTransmit::send_basic_ascii(BESResponseObject * obj, BESDataHandlerInterface & dhi)
+void BESAsciiTransmit::send_basic_ascii(BESResponseObject *obj, BESDataHandlerInterface &dhi)
 {
     BESDEBUG("ascii", "BESAsciiTransmit::send_base_ascii" << endl);
 
@@ -77,29 +81,21 @@ void BESAsciiTransmit::send_basic_ascii(BESResponseObject * obj, BESDataHandlerI
     string constraint = www2id(dhi.data[POST_CONSTRAINT], "%", "%20%26");
 
     try {
-        BESDEBUG("ascii", "BESAsciiTransmit::send_base_ascii - parsing constraint: " << constraint << endl);
         ce.parse_constraint(constraint, *dds);
     }
     catch (InternalErr &e) {
-        string err = "Failed to parse the constraint expression: " + e.get_error_message();
-        throw BESDapError(err, true, e.get_error_code(), __FILE__, __LINE__);
+        throw BESDapError("Failed to parse the constraint expression: " + e.get_error_message(), true, e.get_error_code(), __FILE__, __LINE__);
     }
     catch (Error &e) {
-        string err = "Failed to parse the constraint expression: " + e.get_error_message();
-        throw BESDapError(err, false, e.get_error_code(), __FILE__, __LINE__);
+        throw BESDapError("Failed to parse the constraint expression: " + e.get_error_message(), false, e.get_error_code(), __FILE__, __LINE__);
     }
     catch (...) {
         throw BESInternalFatalError("Failed to parse the constraint expression: Unknown exception caught", __FILE__, __LINE__);
     }
 
-    BESDEBUG("ascii", "BESAsciiTransmit::send_base_ascii - tagging sequences" << endl);
     dds->tag_nested_sequences(); // Tag Sequences as Parent or Leaf node.
 
-    BESDEBUG("ascii", "BESAsciiTransmit::send_base_ascii - "
-            "accessing container" << endl);
-    string dataset_name = dhi.container->access();
-
-    BESDEBUG("ascii", "BESAsciiTransmit::send_base_ascii - dataset_name = " << dataset_name << endl);
+    // string dataset_name = dhi.container->access();
 
 	try {
 		// Handle *functional* constraint expressions specially
@@ -123,9 +119,7 @@ void BESAsciiTransmit::send_basic_ascii(BESResponseObject * obj, BESDataHandlerI
             // Iterate through the variables in the DataDDS and read in the data
             // if the variable has the send flag set.
             for (DDS::Vars_iter i = dds->var_begin(); i != dds->var_end(); i++) {
-                BESDEBUG("ascii", "processing var: " << (*i)->name() << endl);
                 if ((*i)->send_p()) {
-                    BESDEBUG("ascii", "reading some data for: " << (*i)->name() << endl);
                     (**i).intern_data(ce, *dds);
                 }
             }
@@ -145,17 +139,12 @@ void BESAsciiTransmit::send_basic_ascii(BESResponseObject * obj, BESDataHandlerI
     try {
         // Now that we have constrained the DataDDS and read in the data,
         // send it as ascii
-        BESDEBUG("ascii", "converting to ascii datadds" << endl);
         DataDDS *ascii_dds = datadds_to_ascii_datadds(dds);
 
-        BESDEBUG("ascii", "getting ascii values" << endl);
         get_data_values_as_ascii(ascii_dds, dhi.get_output_stream());
 
-        BESDEBUG("ascii", "got the ascii values" << endl);
         dhi.get_output_stream() << flush;
         delete ascii_dds;
-
-        BESDEBUG("ascii", "done transmitting ascii" << endl);
     }
     catch (InternalErr &e) {
         throw BESDapError("Failed to get values as ascii: " + e.get_error_message(), true, e.get_error_code(), __FILE__, __LINE__);
@@ -168,124 +157,51 @@ void BESAsciiTransmit::send_basic_ascii(BESResponseObject * obj, BESDataHandlerI
     }
 }
 
-void BESAsciiTransmit::send_http_ascii(BESResponseObject * obj, BESDataHandlerInterface & dhi)
-{
-    set_mime_text(dhi.get_output_stream(), dods_data, x_plain);
-    BESAsciiTransmit::send_basic_ascii(obj, dhi);
-}
-
-
 /**
  * Transmits DAP4 Data as Comma Separated Values
  */
-void BESAsciiTransmit::send_dap4_csv(BESResponseObject * obj, BESDataHandlerInterface & dhi)
+void BESAsciiTransmit::send_dap4_csv(BESResponseObject *obj, BESDataHandlerInterface &dhi)
 {
     BESDEBUG("ascii", "BESAsciiTransmit::send_dap4_csv" << endl);
 
     BESDMRResponse *bdmr = dynamic_cast<BESDMRResponse *>(obj);
     DMR *dmr = bdmr->get_dmr();
-    // ConstraintEvaluator & ce = bdmr->get_ce();
 
+    string dap4Constraint = www2id(dhi.data[DAP4_CONSTRAINT], "%", "%20%26");
+    string dap4Function = www2id(dhi.data[DAP4_FUNCTION], "%", "%20%26");
 
+    // Not sure we need this...
     dhi.first_container();
 
-    string dap4ConstraintParameter = www2id(dhi.data[DAP4_CONSTRAINT], "%", "%20%26");
-    string dap4FunctionParameter = www2id(dhi.data[DAP4_FUNCTION], "%", "%20%26");
-
-#if 0
-
     try {
-        BESDEBUG("ascii", "BESAsciiTransmit::send_dap4_csv - parsing DAP4 constraint: " << dap4ConstraintParameter << endl);
-        ce.parse_constraint(dap4ConstraintParameter, *dmr);
-    }
-    catch (InternalErr &e) {
-        string err = "Failed to parse the constraint expression: " + e.get_error_message();
-        throw BESDapError(err, true, e.get_error_code(), __FILE__, __LINE__);
-    }
-    catch (Error &e) {
-        string err = "Failed to parse the constraint expression: " + e.get_error_message();
-        throw BESDapError(err, false, e.get_error_code(), __FILE__, __LINE__);
-    }
-    catch (...) {
-        throw BESInternalFatalError("Failed to parse the constraint expression: Unknown exception caught", __FILE__, __LINE__);
-    }
-
-    BESDEBUG("ascii", "BESAsciiTransmit::send_dap4_csv - tagging sequences" << endl);
-    dds->tag_nested_sequences(); // Tag Sequences as Parent or Leaf node.
-
-    BESDEBUG("ascii", "BESAsciiTransmit::send_dap4_csv - "
-            "accessing container" << endl);
-    string dataset_name = dhi.container->access();
-
-    BESDEBUG("ascii", "BESAsciiTransmit::send_dap4_csv - dataset_name = " << dataset_name << endl);
-
-	try {
 		// Handle *functional* constraint expressions specially
-		if (ce.function_clauses()) {
-			BESDEBUG("ascii", "processing a functional constraint clause(s)." << endl);
-			// This leaks the DDS on the LHS, I think. jhrg 7/29/14
-			// Yes, eval_function_clauses() allocates a new DDS object which
-			// it returns. This code was assigning that to 'dds' which is
-			// a pointer to the DataDDS managed by the BES. The fix is to
-			// store that in a temp, pass that new pointer into the BES object,
-			// delete the old object held by the BES and then set the local pointer
-			// so that the remaining code can use it. See ticket 2240. All of the
-			// Transmitter functions in BES modules will need this fix if they
-			// call eval_function_clauses(). jhrg 7/30/14
-			DataDDS *new_dds = ce.eval_function_clauses(*dds);
-			bdds->set_dds(new_dds);
-			delete dds;
-			dds = new_dds;
+		// Use the D4FunctionDriver class and evaluate the functions, building
+		// an new DMR, then evaluate the D4CE in the context of that DMR.
+		// This might be coded as "if (there's a function) do this else process the CE".
+		// Or it might be coded as "if (there's a function) build the new DMR, then fall
+		// through and process the CE but on the new DMR". jhrg 9/3/14
+
+		if (!dap4Constraint.empty()) {
+			D4CEDriver d4ce(dmr);
+			d4ce.parse(dap4Constraint);
 		}
-        else {
-            // Iterate through the variables in the DataDDS and read in the data
-            // if the variable has the send flag set.
-            for (DDS::Vars_iter i = dds->var_begin(); i != dds->var_end(); i++) {
-                BESDEBUG("ascii", "processing var: " << (*i)->name() << endl);
-                if ((*i)->send_p()) {
-                    BESDEBUG("ascii", "reading some data for: " << (*i)->name() << endl);
-                    (**i).intern_data(ce, *dds);
-                }
-            }
-        }
-    }
+		else {
+			dmr->root()->set_send_p(true);
+		}
 
-    catch (InternalErr &e) {
-        throw BESDapError("Failed to read data: " + e.get_error_message(), true, e.get_error_code(), __FILE__, __LINE__);
-    }
-    catch (Error & e) {
-        throw BESDapError("Failed to read data: " + e.get_error_message(), false, e.get_error_code(), __FILE__, __LINE__);
-    }
-    catch (...) {
-        throw BESInternalFatalError("Failed to read data: Unknown exception caught", __FILE__, __LINE__);
-    }
-
-    try {
-        // Now that we have constrained the DataDDS and read in the data,
-        // send it as ascii
-        BESDEBUG("ascii", "converting to ascii datadds" << endl);
-        DataDDS *ascii_dds = datadds_to_ascii_datadds(dds);
-
-        BESDEBUG("ascii", "getting ascii values" << endl);
-        get_data_values_as_ascii(ascii_dds, dhi.get_output_stream());
-
-        BESDEBUG("ascii", "got the ascii values" << endl);
-        dhi.get_output_stream() << flush;
-        delete ascii_dds;
-
-        BESDEBUG("ascii", "done transmitting ascii" << endl);
+		print_values_as_ascii(dmr, dhi.get_output_stream());
+    	dhi.get_output_stream() << flush;
     }
     catch (InternalErr &e) {
-        throw BESDapError("Failed to get values as ascii: " + e.get_error_message(), true, e.get_error_code(), __FILE__, __LINE__);
+        throw BESDapError("Failed to return values as ascii: " + e.get_error_message(), true, e.get_error_code(), __FILE__, __LINE__);
     }
     catch (Error &e) {
-        throw BESDapError("Failed to get values as ascii: " + e.get_error_message(), false, e.get_error_code(), __FILE__, __LINE__);
+        throw BESDapError("Failed to return values as ascii: " + e.get_error_message(), false, e.get_error_code(), __FILE__, __LINE__);
     }
     catch (...) {
-        throw BESInternalFatalError("Failed to get values as ascii: Unknown exception caught", __FILE__, __LINE__);
+        throw BESInternalFatalError("Failed to return values as ascii: Unknown exception caught", __FILE__, __LINE__);
     }
 
-#endif
-
+    BESDEBUG("ascii", "Done BESAsciiTransmit::send_dap4_csv" << endl);
 }
 
