@@ -48,7 +48,7 @@ BESAsciiRequestHandler::~BESAsciiRequestHandler()
 {
 }
 
-bool BESAsciiRequestHandler::dap_build_help(BESDataHandlerInterface &dhi)
+bool BESAsciiRequestHandler::dap_build_help(BESDataHandlerInterface &)
 {
     // the usage request handler is already loading this and, since all
     // three dap-server modules are usually loaded, we'll assume it's

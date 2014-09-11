@@ -48,7 +48,11 @@ namespace dap_asciival {
 using namespace libdap;
 using namespace std;
 
-static void print_values_as_ascii(BaseType *btp, Crc32 &checksum, ostream &strm);
+// most of the code here defines functions before they are used; these three
+// need to be declared.
+static void print_values_as_ascii(BaseType *btp, bool print_name, ostream &strm, Crc32 &checksum);
+static void print_sequence_header(D4Sequence *s, ostream &strm);
+static void print_val_by_rows(D4Sequence *seq, ostream &strm, Crc32 &checksum);
 
 /**
  * For an Array that holds a vector of scalar values, print it on one
@@ -218,7 +222,7 @@ static int get_index(Array *a, vector<int> indices)
     return index;
 }
 
-static void print_complex_array(Array *a, ostream &strm, bool /*print_name */, Crc32 &checksum)
+static void print_complex_array(Array *a, ostream &strm, bool print_name, Crc32 &checksum)
 {
     int dims = a->dimensions(true);
     if (dims < 1)
@@ -240,7 +244,7 @@ static void print_complex_array(Array *a, ostream &strm, bool /*print_name */, C
         }
         strm << endl;
 
-    	print_values_as_ascii(a->var(get_index(a, state)), checksum, strm);
+    	print_values_as_ascii(a->var(get_index(a, state)), print_name, strm, checksum);
 
         more_indices = increment_state(&state, shape);
         if (more_indices)
@@ -249,43 +253,38 @@ static void print_complex_array(Array *a, ostream &strm, bool /*print_name */, C
     } while (more_indices);
 }
 
-static void
-print_values_as_ascii(Array *a, Crc32 &checksum, ostream &strm)
+static void print_values_as_ascii(Array *a, bool print_name, ostream &strm, Crc32 &checksum)
 {
     if (a->var()->is_simple_type()) {
         if (a->dimensions(true) > 1) {
-            print_ndim_array(a, strm, true /*print_name*/);
+            print_ndim_array(a, strm, print_name);
         }
         else {
-            print_array_vector(a, strm, true /*print_name*/);
+            print_array_vector(a, strm, print_name);
         }
     }
     else {
-    	print_complex_array(a, strm, true /*print_name*/, checksum);
+    	print_complex_array(a, strm, print_name, checksum);
     }
 }
 
-static void
-print_structure_header(Structure *s, ostream &strm)
+static void print_structure_header(Structure *s, ostream &strm)
 {
-    Constructor::Vars_iter p = s->var_begin(), e = s->var_end();
-    while (p != e) {
-	if ((*p)->is_simple_type())
-	    strm << (*p)->FQN(); //dynamic_cast<AsciiOutput*>(*p)->get_full_name() ;
-	else if ((*p)->type() == dods_structure_c)
-	    print_structure_header(static_cast<Structure*>(*p), strm); //dynamic_cast<AsciiStructure*>((*p))->print_header(strm);
-	// May need a case here for Sequence 2/18/2002 jhrg
-	// Yes, we do, and for Grid as well. 04/04/03 jhrg
-	else
-	    throw InternalErr(__FILE__, __LINE__,
-			      "Support for ASCII output of datasets with structures which contain Sequences or Grids has not been completed.");
-	if (++p != e)
-	    strm << ", " ;
-    }
+	Constructor::Vars_iter p = s->var_begin(), e = s->var_end();
+	while (p != e) {
+		if ((*p)->is_simple_type())
+			strm << (*p)->FQN();
+		else if ((*p)->type() == dods_structure_c)
+			print_structure_header(static_cast<Structure*>(*p), strm);
+		else if ((*p)->type() == dods_sequence_c)
+			print_sequence_header(static_cast<D4Sequence*>(*p), strm);
+		else
+			throw InternalErr(__FILE__, __LINE__, "Unknown or unsupported type.");
+		if (++p != e) strm << ", ";
+	}
 }
 
-static void
-print_structure_ascii(Structure *s, ostream &strm, bool print_name, Crc32 &checksum)
+static void print_structure_ascii(Structure *s, ostream &strm, bool print_name, Crc32 &checksum)
 {
 	if (s->is_linear()) {
 		if (print_name) {
@@ -296,7 +295,7 @@ print_structure_ascii(Structure *s, ostream &strm, bool print_name, Crc32 &check
 		Constructor::Vars_iter p = s->var_begin(), e = s->var_end();
 		while (p !=e) {
 			// bug: print_name should be false, but will be true because it's not a param here
-			if ((*p)->send_p()) print_values_as_ascii(*p, checksum, strm);
+			if ((*p)->send_p()) print_values_as_ascii(*p, false /*print_name*/, strm, checksum);
 
 			if (++p != e) strm << ", ";
 		}
@@ -304,7 +303,7 @@ print_structure_ascii(Structure *s, ostream &strm, bool print_name, Crc32 &check
 	else {
 		for (Constructor::Vars_iter p = s->var_begin(), e = s->var_end(); p != e; ++p) {
 			if ((*p)->send_p()) {
-				print_values_as_ascii(*p, checksum, strm);
+				print_values_as_ascii(*p, print_name, strm, checksum);
 				// This line outputs an extra endl when print_ascii is called for
 				// nested structures because an endl is written for each member
 				// and then once for the structure itself. 9/14/2001 jhrg
@@ -314,32 +313,120 @@ print_structure_ascii(Structure *s, ostream &strm, bool print_name, Crc32 &check
 	}
 }
 
-static void
-print_values_as_ascii(Structure *v, Crc32 &checksum, ostream &strm)
+static void print_values_as_ascii(Structure *v, bool print_name, ostream &strm, Crc32 &checksum)
 {
-	print_structure_ascii(v, strm, true /*print name*/, checksum);
+	print_structure_ascii(v, strm, print_name, checksum);
 }
 
-static void
-print_values_as_ascii(D4Sequence *v, Crc32 &, ostream &strm)
+static void print_one_row(D4Sequence *seq, ostream &strm, Crc32 &checksum, int row)
 {
-	strm << v->FQN() << ", " << "Not Implemented for D4Sequence." << endl;
+	int elements = seq->element_count();
+	cerr << seq->name() << " elements: " << elements << endl;
+	int j = 0;
+	BaseType *btp = 0;
+	bool first_val = true;
+
+	while (j < elements) {
+		btp = seq->var_value(row, j++);
+		cerr << "btp: " << btp << endl;
+		if (btp) {  // data
+			if (!first_val)
+				strm << ", ";
+			first_val = false;
+			if (btp->type() == dods_sequence_c)
+				print_val_by_rows(static_cast<D4Sequence*>(btp), strm, checksum);
+			else
+				print_values_as_ascii(btp, false, strm, checksum);
+		}
+	}
 }
 
-static void
-print_values_as_ascii(D4Enum *v, Crc32 &, ostream &strm)
+static void print_val_by_rows(D4Sequence *seq, ostream &strm, Crc32 &checksum)
 {
-	strm << v->FQN() << ", " << "Not Implemented for D4Enum." << endl;
+	if (seq->length() != 0) {
+		int rows = seq->length() /*- 1*/;	// -1 because the last row is treated specially
+		for (int i = 0; i < rows; ++i) {
+			print_one_row(seq, strm, checksum, i);
+			strm << endl;
+		}
+	}
 }
 
-static void
-print_values_as_ascii(D4Opaque *v, Crc32 &, ostream &strm)
+static void print_sequence_header(D4Sequence *s, ostream &strm)
 {
-	strm << v->FQN() << ", " << "Not Implemented for D4Opaque." << endl;
+	Constructor::Vars_iter p = s->var_begin(), e = s->var_end();
+	while (p != e) {
+		if ((*p)->is_simple_type())
+			strm << (*p)->FQN();
+		else if ((*p)->type() == dods_structure_c)
+			print_structure_header(static_cast<Structure*>(*p), strm);
+		else if ((*p)->type() == dods_sequence_c)
+			print_sequence_header(static_cast<D4Sequence*>(*p), strm);
+		else
+			throw InternalErr(__FILE__, __LINE__, "Unknown or unsupported type.");
+		if (++p != e) strm << ", ";
+	}
 }
 
-static void
-print_values_as_ascii(BaseType *btp, Crc32 &checksum, ostream &strm)
+
+static void print_values_as_ascii(D4Sequence *v, bool print_name, ostream &strm, Crc32 &checksum)
+{
+	if (print_name) {
+		print_sequence_header(v, strm);
+		strm << endl;
+	}
+
+	print_val_by_rows(v, strm, checksum);
+}
+
+static void print_values_as_ascii(D4Opaque *v, bool print_name, ostream &strm, Crc32 &/*checksum*/)
+{
+	if (print_name)
+		strm << v->FQN() << ", ";
+	strm << v->value().size() << " bytes" << endl;
+}
+
+static void print_values_as_ascii(D4Group *group, bool print_name, ostream &strm, Crc32 &checksum)
+{
+    for (D4Group::groupsIter g = group->grp_begin(), e = group->grp_end(); g != e; ++g)
+    	print_values_as_ascii(*g, print_name, strm, checksum);
+
+    // Specialize how the top-level variables in any Group are sent; include
+    // a checksum for them. A subset operation might make an interior set of
+    // variables, but the parent structure will still be present and the checksum
+    // will be computed for that structure. In other words, DAP4 does not try
+    // to sort out which variables are the 'real' top-level variables and instead
+    // simply computes the CRC for whatever appears as a variable in the root
+    // group.
+	for (Constructor::Vars_iter i = group->var_begin(), e = group->var_end(); i != e; ++i) {
+		// Only send the stuff in the current subset.
+		if ((*i)->send_p()) {
+			checksum.Reset();
+
+			(*i)->intern_data(checksum);
+
+			// print the data
+			print_values_as_ascii((*i), print_name, strm, checksum);
+
+			// Print the checksum: name():DAP4_Checksum_CRC32, checksum value
+		    ostringstream oss;
+		    oss.setf(ios::hex, ios::basefield);
+		    oss << setfill('0') << setw(8) << checksum.GetCrc32();
+		    strm << (*i)->FQN() << ":DAP4_Checksum_CRC32, " << oss.str() << endl;
+		}
+	}
+}
+
+/**
+ * This is the main function; it controls delegation to all the other functions.
+ *
+ * @param btp Print this variable
+ * @param print_name Print the variable's name, then a comma, then the values if true,
+ * otherwise just print the values
+ * @param strm Print to this stream
+ * @param checksum Use this to hold the state of the checksum computation
+ */
+static void print_values_as_ascii(BaseType *btp, bool print_name, ostream &strm, Crc32 &checksum)
 {
     switch (btp->type()) {
     case dods_null_c:
@@ -363,70 +450,36 @@ print_values_as_ascii(BaseType *btp, Crc32 &checksum, ostream &strm)
     case dods_float64_c:
     case dods_str_c:
     case dods_url_c:
-    	strm << btp->FQN() << ", ";
+    case dods_enum_c:
+    	if (print_name) strm << btp->FQN() << ", ";
         btp->print_val(strm, "" /*leading space*/, false /*print dap2 decl*/);
         break;
 
-    case dods_enum_c:
-    	print_values_as_ascii(static_cast<D4Enum*>(btp), checksum, strm);
-    	break;
-
     case dods_opaque_c:
-    	print_values_as_ascii(static_cast<D4Opaque*>(btp), checksum, strm);
+    	print_values_as_ascii(static_cast<D4Opaque*>(btp), print_name, strm, checksum);
     	break;
 
     case dods_array_c:
-    	print_values_as_ascii(static_cast<Array*>(btp), checksum, strm);
+    	print_values_as_ascii(static_cast<Array*>(btp), print_name, strm, checksum);
     	break;
 
     case dods_structure_c:
-    	print_values_as_ascii(static_cast<Structure*>(btp), checksum, strm);
+    	print_values_as_ascii(static_cast<Structure*>(btp), print_name, strm, checksum);
     	break;
 
     case dods_sequence_c:
-    	print_values_as_ascii(static_cast<D4Sequence*>(btp), checksum, strm);
+    	print_values_as_ascii(static_cast<D4Sequence*>(btp), print_name, strm, checksum);
+    	break;
+
+    case dods_group_c:
+    	print_values_as_ascii(static_cast<D4Group*>(btp), print_name, strm, checksum);
     	break;
 
     case dods_grid_c:
-    case dods_group_c:
     default:
     	throw InternalErr(__FILE__, __LINE__, "Unsupported type");
     }
 }
-
-#if 0
-static void
-print_values_as_ascii(D4Group *group, Crc32 &checksum, ostream &strm)
-{
-    for (D4Group::groupsIter g = group->grp_begin(), e = group->grp_end(); g != e; ++g)
-    	print_values_as_ascii(*g, checksum, strm);
-
-    // Specialize how the top-level variables in any Group are sent; include
-    // a checksum for them. A subset operation might make an interior set of
-    // variables, but the parent structure will still be present and the checksum
-    // will be computed for that structure. In other words, DAP4 does not try
-    // to sort out which variables are the 'real' top-level variables and instead
-    // simply computes the CRC for whatever appears as a variable in the root
-    // group.
-	for (Constructor::Vars_iter i = group->var_begin(), e = group->var_end(); i != e; ++i) {
-		// Only send the stuff in the current subset.
-		if ((*i)->send_p()) {
-			checksum.Reset();
-
-			//(*i)->intern_data(checksum, dmr);
-
-			// print the data
-			print_values_as_ascii((*i), checksum, strm);
-
-			// Print the checksum: name():DAP4_Checksum_CRC32, checksum value
-		    ostringstream oss;
-		    oss.setf(ios::hex, ios::basefield);
-		    oss << setfill('0') << setw(8) << checksum.GetCrc32();
-		    strm << (*i)->FQN() << ":DAP4_Checksum_CRC32, " << oss.str() << endl;
-		}
-	}
-}
-#endif
 
 /**
  * For each variable in the DMR, write out the CSV/ASCII representation
@@ -435,39 +488,13 @@ print_values_as_ascii(D4Group *group, Crc32 &checksum, ostream &strm)
  * @param dmr
  * @param strm
  */
-void
-print_values_as_ascii(DMR *dmr, ostream &strm)
+void print_values_as_ascii(DMR *dmr, ostream &strm)
 {
 	Crc32 checksum;
-	D4Group *group = dmr->root();
 
-    for (D4Group::groupsIter g = group->grp_begin(), e = group->grp_end(); g != e; ++g)
-    	print_values_as_ascii(*g, checksum, strm);
+	strm << "Dataset: " << dmr->name() << endl;
 
-    // Specialize how the top-level variables in any Group are sent; include
-    // a checksum for them. A subset operation might make an interior set of
-    // variables, but the parent structure will still be present and the checksum
-    // will be computed for that structure. In other words, DAP4 does not try
-    // to sort out which variables are the 'real' top-level variables and instead
-    // simply computes the CRC for whatever appears as a variable in the root
-    // group.
-	for (Constructor::Vars_iter i = group->var_begin(), e = group->var_end(); i != e; ++i) {
-		// Only send the stuff in the current subset.
-		if ((*i)->send_p()) {
-			checksum.Reset();
-
-			(*i)->intern_data(checksum, *dmr);
-
-			// print the data
-			print_values_as_ascii((*i), checksum, strm);
-
-			// Print the checksum: name():DAP4_Checksum_CRC32, checksum value
-		    ostringstream oss;
-		    oss.setf(ios::hex, ios::basefield);
-		    oss << setfill('0') << setw(8) << checksum.GetCrc32();
-		    strm << endl << (*i)->FQN() << ":DAP4_Checksum_CRC32, " << oss.str() << endl;
-		}
-	}
+	print_values_as_ascii(dmr->root(), true /*print_name*/, strm, checksum);
 }
 
 } // namespace dap_asciival
