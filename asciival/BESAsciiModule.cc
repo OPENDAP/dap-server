@@ -44,7 +44,7 @@ using std::endl;
 #include "BESReturnManager.h"
 #include "BESTransmitterNames.h"
 
-#include "BESAsciiResponseHandler.h"
+//#include "BESAsciiResponseHandler.h"
 
 #include "BESAsciiRequestHandler.h"
 #include "BESRequestHandlerList.h"
