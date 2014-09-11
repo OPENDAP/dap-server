@@ -321,14 +321,12 @@ static void print_values_as_ascii(Structure *v, bool print_name, ostream &strm, 
 static void print_one_row(D4Sequence *seq, ostream &strm, Crc32 &checksum, int row)
 {
 	int elements = seq->element_count();
-	cerr << seq->name() << " elements: " << elements << endl;
 	int j = 0;
 	BaseType *btp = 0;
 	bool first_val = true;
 
 	while (j < elements) {
 		btp = seq->var_value(row, j++);
-		cerr << "btp: " << btp << endl;
 		if (btp) {  // data
 			if (!first_val)
 				strm << ", ";
@@ -407,6 +405,7 @@ static void print_values_as_ascii(D4Group *group, bool print_name, ostream &strm
 
 			// print the data
 			print_values_as_ascii((*i), print_name, strm, checksum);
+			strm << endl;
 
 			// Print the checksum: name():DAP4_Checksum_CRC32, checksum value
 		    ostringstream oss;
