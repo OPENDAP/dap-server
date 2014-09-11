@@ -1,0 +1,33 @@
+Dataset: DMR_7.7
+/s[0]
+/ss.i, /ss.j
+123456789, 123456789
+/s[1]
+/ss.i, /ss.j
+123456789, 123456789
+/s[2]
+/ss.i, /ss.j
+123456789, 123456789
+/s[3]
+/ss.i, /ss.j
+123456789, 123456789
+/s[4]
+/ss.i, /ss.j
+123456789, 123456789
+/s:DAP4_Checksum_CRC32, 7c5e1ddb
+/t[0]
+/tt.i, 123456789
+/tt.a, "Silly test string: 1", "Silly test string: 1", "Silly test string: 1"
+/t[1]
+/tt.i, 123456789
+/tt.a, "Silly test string: 1", "Silly test string: 1", "Silly test string: 1"
+/t[2]
+/tt.i, 123456789
+/tt.a, "Silly test string: 1", "Silly test string: 1", "Silly test string: 1"
+/t[3]
+/tt.i, 123456789
+/tt.a, "Silly test string: 1", "Silly test string: 1", "Silly test string: 1"
+/t[4]
+/tt.i, 123456789
+/tt.a, "Silly test string: 1", "Silly test string: 1", "Silly test string: 1"
+/t:DAP4_Checksum_CRC32, 75c84a99
