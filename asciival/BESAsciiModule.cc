@@ -53,9 +53,11 @@ using std::endl;
 
 #include "BESAsciiTransmit.h"
 
+#if 0
 #define ASCII_RESPONSE "get.ascii"
 #define ASCII_SERVICE "ascii"
 #define ASCII_RESPONSE_STR "getAscii"
+#endif
 
 void BESAsciiModule::initialize(const string &modname)
 {
