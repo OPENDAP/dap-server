@@ -222,6 +222,15 @@ static int get_index(Array *a, vector<int> indices)
     return index;
 }
 
+/**
+ * This prints Arrays that contain Structures and Sequences. Arrays of simple
+ * types (scalars) are printed using the print_array_vector() and print_ndim_array().
+ *
+ * @param a The Array to print
+ * @param strm
+ * @param print_name
+ * @param checksum
+ */
 static void print_complex_array(Array *a, ostream &strm, bool print_name, Crc32 &checksum)
 {
     int dims = a->dimensions(true);
@@ -247,12 +256,22 @@ static void print_complex_array(Array *a, ostream &strm, bool print_name, Crc32 
     	print_values_as_ascii(a->var(get_index(a, state)), print_name, strm, checksum);
 
         more_indices = increment_state(&state, shape);
+
         if (more_indices)
             strm << endl;
 
     } while (more_indices);
 }
 
+/**
+ * Print an array. Based on the prototype and number of dimensions,
+ * choose a print function.
+ *
+ * @param a
+ * @param print_name
+ * @param strm
+ * @param checksum
+ */
 static void print_values_as_ascii(Array *a, bool print_name, ostream &strm, Crc32 &checksum)
 {
     if (a->var()->is_simple_type()) {
