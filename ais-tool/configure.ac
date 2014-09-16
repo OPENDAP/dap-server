@@ -13,7 +13,7 @@ AM_CONFIG_HEADER([config.h])
 AC_DEFINE([DAP_VERSION], ["2.0"], [What version of the data server is this?])
 
 dnl flags for the compilers and linkers - set these before locating the
-dnl actual tools since some of the AC_PROG macros set these `flag variables'
+dnl actual tools since some of the AC_PROG macros set these 'flag variables'
 dnl to default values otherwise.
 
 AC_CANONICAL_HOST
@@ -91,8 +91,6 @@ dnl I wrote these checks because we need the *-config scripts to build, so
 dnl the AC_CHECK_LIB macro is not needed.
 
 AC_PATH_PROG([CURL], [curl], [*** Where is curl? ***], [/bin:/usr/bin])
-
-OPENDAP_DEBUG_OPTION
 
 dnl autoheader macros; tack some text at the top and bottom of config.h.in
 AH_TOP([#ifndef _config_h

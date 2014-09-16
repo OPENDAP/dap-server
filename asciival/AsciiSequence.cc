@@ -80,7 +80,7 @@ AsciiSequence::~AsciiSequence()
 }
 
 int
-AsciiSequence::length()
+AsciiSequence::length() const
 {
     return -1;
 }

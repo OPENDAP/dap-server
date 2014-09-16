@@ -136,8 +136,6 @@ dnl the AC_CHECK_LIB macro is not needed.
 
 AC_PATH_PROG([CURL], [curl], [*** Where is curl? ***], [/bin:/usr/bin])
 
-OPENDAP_DEBUG_OPTION
-
 dnl autoheader macros; tack some text at the top and bottom of config.h.in
 AH_TOP([#ifndef _config_h
 #define _config_h])
