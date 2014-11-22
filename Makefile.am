@@ -8,6 +8,14 @@
 AUTOMAKE_OPTIONS = foreign check-news
 ACLOCAL_AMFLAGS = -I conf
 
+if DAP_MODULES
+AM_CPPFLAGS = -I$(top_srcdir)/dispatch -I$(top_srcdir)/dap $(DAP_CFLAGS)
+LIBADD = $(DAP_SERVER_LIBS) $(DAP_CLIENT_LIBS)
+else
+AM_CPPFLAGS = $(BES_CPPFLAGS)
+LIBADD = $(BES_DAP_LIBS)
+endif
+
 SUBDIRS = . asciival www-interface
 
 lib_besdir=$(libdir)/bes
@@ -24,9 +32,9 @@ BES_SOURCES = BESUsageModule.h BESUsageNames.h BESUsageResponseHandler.h \
 	  BESUsageRequestHandler.h
 
 libusage_module_la_SOURCES = $(USAGE_SOURCES) $(BES_SOURCES)
-libusage_module_la_CPPFLAGS = $(BES_CPPFLAGS)
+# libusage_module_la_CPPFLAGS = $(BES_CPPFLAGS)
 libusage_module_la_LDFLAGS = -avoid-version -module 
-libusage_module_la_LIBADD = $(BES_DAP_LIBS)
+libusage_module_la_LIBADD = $(LIBADD) # $(BES_DAP_LIBS)
 
 EXTRA_DIST = COPYING COPYRIGHT_URI dap-server.spec README \
 	dap-server.conf.in OSX_Resources

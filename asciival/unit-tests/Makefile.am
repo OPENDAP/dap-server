@@ -3,9 +3,17 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-# Arrange to build with the backward compatibility mode enabled.
+if DAP_MODULES
+AM_CPPFLAGS = -I$(top_srcdir)/dispatch -I$(top_srcdir)/dap \
+-I$(top_srcdir)/modules/dap-server \
+-I$(top_srcdir)/modules/dap-server/asciival $(DAP_CFLAGS)
+LIBADD =  $(BES_DISPATCH_LIB) $(BES_EXTRA_LIBS) $(DAP_CLIENT_LIBS)
+else
 AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/asciival $(BES_CPPFLAGS)
-AM_LDADD =
+LIBADD = $(BES_DAP_LIBS)
+endif
+
+AM_LDADD = $(LIBADD)
 AM_CXXFLAGS = 
 
 if CPPUNIT
@@ -20,7 +28,6 @@ TEST_COV_FLAGS = -ftest-coverage -fprofile-arcs
 
 # This header file is used for parse files
 noinst_HEADERS = test_config.h
-#BUILT_SOURCES = test_config.h
 
 check_PROGRAMS = $(UNIT_TESTS)
 
@@ -35,9 +42,6 @@ DISTCLEANFILES = *.Po test_config.h
 ############################################################################
 # Unit Tests
 #
-
-#test_config.h: test_config.h.in Makefile
-#	sed -e "s%[@]srcdir[@]%${srcdir}%" $< > test_config.h
 
 # The object files from asciival are needed to link the unit tests
 ASCIIOBJS = ../AsciiByte.o ../AsciiInt32.o ../AsciiFloat64.o ../AsciiStr.o   \
@@ -63,6 +67,6 @@ endif
 AsciiArrayTest_SOURCES = AsciiArrayTest.cc
 AsciiOutputTest_SOURCES = AsciiOutputTest.cc
 
-AsciiArrayTest_LDADD = $(ASCIIOBJS) $(BES_DAP_LIBS) $(AM_LDADD)
-AsciiOutputTest_LDADD = $(ASCIIOBJS) $(BES_DAP_LIBS) $(AM_LDADD)
+AsciiArrayTest_LDADD = $(ASCIIOBJS) $(AM_LDADD)
+AsciiOutputTest_LDADD = $(ASCIIOBJS) $(AM_LDADD)
 
