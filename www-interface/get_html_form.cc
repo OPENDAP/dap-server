@@ -205,6 +205,9 @@ void write_html_form_interface(FILE * dest, DDS * dds,
         // Javascript code here
         << java_code << "\n"
         << "DODS_URL = new dods_url(\"" << url << "\");\n"
+	<< "this.top.location !== this.location && (this.top.location = this.location);\n" //break out of iframe.
+	<< "if (top.frames.length!=0)\n" //another breakout check
+        << "    top.location=self.document.location;\n" //just to be sure.
         << "// -->\n"
         << "</script>\n"
         << "</head>\n"
@@ -274,6 +277,9 @@ void write_html_form_interface(ostream &strm, DDS * dds, const string & url, boo
         // Javascript code here
         << java_code << "\n"
         << "DODS_URL = new dods_url(\"" << url << "\");\n"
+        << "this.top.location !== this.location && (this.top.location = this.location);\n" //break out of iframe.
+        << "if (top.frames.length!=0)\n" //another breakout check
+        << "    top.location=self.document.location;\n" //just to be sure.
         << "// -->\n"
         << "</script>\n"
         << "</head>\n"
