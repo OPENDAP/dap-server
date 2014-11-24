@@ -95,10 +95,10 @@ void WWWOutput::write_disposition(string url, bool netcdf3_file_response, bool n
     	*d_strm << "<input type=\"button\" value=\"Get as NetCDF 3\" onclick=\"binary_button('nc')\">\n";
     // Add new new netcdf4 button. jhrg 9/23/13
     if (netcdf4_file_response)
-    	*d_strm << "<input type=\"button\" value=\"Get as NetCDF 4\" onclick=\"binary_button('dap.nc4')\">\n";
+    	*d_strm << "<input type=\"button\" value=\"Get as NetCDF 4\" onclick=\"binary_button('nc4')\">\n";
 
     *d_strm <<
-"<input type=\"button\" value=\"Binary (DAP) Object\" onclick=\"binary_button('dods')\">\n\
+"<input type=\"button\" value=\"Binary (DAP2) Object\" onclick=\"binary_button('dods')\">\n\
 <input type=\"button\" value=\"Show Help\" onclick=\"help_button()\">\n\
 \n\
 <tr>\n\
