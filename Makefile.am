@@ -56,7 +56,7 @@ install-data-local: dap-server.conf
 uninstall-local:
 	rm -f $(DESTDIR)$(sysconfdir)/bes/modules/dap-server.conf
 
-dap-server.conf: dap-server.conf.in config.status
+dap-server.conf: dap-server.conf.in $(top_srcdir)/config.status
 	sed -e "s%[@]bes_modules_dir[@]%${lib_besdir}%" $< > dap-server.conf
 
 C4_DIR=./cccc
