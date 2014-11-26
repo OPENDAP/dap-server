@@ -201,15 +201,22 @@ void write_html_form_interface(FILE * dest, DDS * dds,
         << "\"http://www.w3.org/TR/REC-html40/loose.dtd\">\n" <<
         "<html><head><title>OPeNDAP Server Dataset Query Form</title>\n"
         << "<base href=\"" << help_location << "\">\n" <<
-        "<script type=\"text/javascript\">\n" << "<!--\n"
+        "<script type=\"text/javascript\">\n"
         // Javascript code here
         << java_code << "\n"
         << "DODS_URL = new dods_url(\"" << url << "\");\n"
-	<< "this.top.location !== this.location && (this.top.location = this.location);\n" //break out of iframe.
-	<< "if (top.frames.length!=0)\n" //another breakout check
-        << "    top.location=self.document.location;\n" //just to be sure.
-        << "// -->\n"
         << "</script>\n"
+
+ 	<< "<style id=\"antiClickjack\">body{display:none !important;}</style>\n" //cross frame fix.
+ 	<< "<script type=\"text/javascript\">\n"
+ 	<< "   if (self === top) {\n"
+ 	<< "       var antiClickjack = document.getElementById(\"antiClickjack\");\n"
+ 	<< "       antiClickjack.parentNode.removeChild(antiClickjack);\n"
+ 	<< "   } else {\n"
+ 	<< "       top.location = self.location;\n"
+ 	<< "   }\n"
+ 	<< "</script>\n"
+
         << "</head>\n"
         << "<body>\n"
         <<
@@ -273,15 +280,22 @@ void write_html_form_interface(ostream &strm, DDS * dds, const string & url, boo
         << "\"http://www.w3.org/TR/REC-html40/loose.dtd\">\n" <<
         "<html><head><title>OPeNDAP Server Dataset Query Form</title>\n"
         << "<base href=\"" << help_location << "\">\n" <<
-        "<script type=\"text/javascript\">\n" << "<!--\n"
+        "<script type=\"text/javascript\">\n"
         // Javascript code here
         << java_code << "\n"
         << "DODS_URL = new dods_url(\"" << url << "\");\n"
-        << "this.top.location !== this.location && (this.top.location = this.location);\n" //break out of iframe.
-        << "if (top.frames.length!=0)\n" //another breakout check
-        << "    top.location=self.document.location;\n" //just to be sure.
-        << "// -->\n"
         << "</script>\n"
+
+ 	<< "<style id=\"antiClickjack\">body{display:none !important;}</style>\n" //cross frame fix.
+ 	<< "<script type=\"text/javascript\">\n"
+ 	<< "   if (self === top) {\n"
+ 	<< "       var antiClickjack = document.getElementById(\"antiClickjack\");\n"
+ 	<< "       antiClickjack.parentNode.removeChild(antiClickjack);\n"
+ 	<< "   } else {\n"
+ 	<< "       top.location = self.location;\n"
+ 	<< "   }\n"
+ 	<< "</script>\n"
+
         << "</head>\n"
         << "<body>\n"
         <<
@@ -435,12 +449,11 @@ write_simple_variable(ostream &strm, BaseType *var)
     const string fqn = get_fqn(var);
 
     strm << "<script type=\"text/javascript\">\n"
-         << "<!--\n"
          << name_for_js_code(fqn) << " = new dods_var(\""
          << id2www_ce(fqn)
          << "\", \"" << name_for_js_code(fqn) << "\", 0);\n" <<
-         "DODS_URL.add_dods_var(" << name_for_js_code(fqn) << ");\n" <<
-         "// -->\n" << "</script>\n";
+         "DODS_URL.add_dods_var(" << name_for_js_code(fqn) << ");\n"
+         << "</script>\n";
 
     strm << "<b>"
          << "<input type=\"checkbox\" name=\"get_" << name_for_js_code(fqn)
