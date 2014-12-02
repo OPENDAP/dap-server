@@ -33,27 +33,20 @@
 #ifndef I_BESAsciiTransmit_h
 #define I_BESAsciiTransmit_h 1
 
-#include <BESDataHandlerInterface.h>
-#include <BESBasicTransmitter.h>
+#include "BESDataHandlerInterface.h"
 
-class BESContainer;
 class BESResponseObject ;
 
 #define ASCII_TRANSMITTER "ascii"
-#define DAP4_CSV_TRANSMITTER "csv"
 
-class BESAsciiTransmit: public BESBasicTransmitter
+class BESAsciiTransmit
 {
 public:
-	BESAsciiTransmit();
-    virtual ~BESAsciiTransmit()
-    {
-    }
-
-    static void		send_basic_ascii( BESResponseObject *obj, BESDataHandlerInterface &dhi ) ;
-    static void		send_http_ascii( BESResponseObject *obj, BESDataHandlerInterface &dhi ) ;
+    static void		send_basic_ascii( BESResponseObject *obj,
+    				          BESDataHandlerInterface &dhi ) ;
+    static void		send_http_ascii( BESResponseObject *obj,
+    				         BESDataHandlerInterface &dhi ) ;
 } ;
-
 
 #endif // I_BESAsciiTransmit_h
 

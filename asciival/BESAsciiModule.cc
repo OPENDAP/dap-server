@@ -54,15 +54,14 @@ using std::endl;
 
 void BESAsciiModule::initialize(const string &modname)
 {
-    BESDEBUG("ascii", "Initializing module " << modname << endl);
-
-#if 0
-
+    BESDEBUG("ascii", "Initializing OPeNDAP Ascii module " << modname << endl);
     BESDEBUG("ascii", "    adding " << modname << " request handler" << endl);
+
     BESRequestHandler *handler = new BESAsciiRequestHandler(modname);
     BESRequestHandlerList::TheList()->add_handler(modname, handler);
 
     BESDEBUG("ascii", "    adding " << ASCII_RESPONSE << " response handler" << endl);
+
     BESResponseHandlerList::TheList()->add_handler(ASCII_RESPONSE, BESAsciiResponseHandler::AsciiResponseBuilder);
 
     BESDEBUG("ascii", "Adding to dap services" << endl);
@@ -77,45 +76,12 @@ void BESAsciiModule::initialize(const string &modname)
 
     BESDEBUG("ascii", "    adding ascii debug context" << endl);
     BESDebug::Register("ascii");
-#endif
-
-    BESDEBUG("ascii", "    adding " << modname << " request handler" << endl);
-    BESRequestHandler *handler = new BESAsciiRequestHandler(modname);
-    BESRequestHandlerList::TheList()->add_handler(modname, handler);
-
-
-
-    BESDEBUG( "ascii", "    adding " << ASCII_TRANSMITTER << " transmitter" << endl );
-    BESReturnManager::TheManager()->add_transmitter(ASCII_TRANSMITTER, new BESAsciiTransmit());
-
-    //BESDEBUG( "ascii", "    adding " << DAP4_CSV_TRANSMITTER << " transmitter" << endl );
-    //BESReturnManager::TheManager()->add_transmitter(DAP4_CSV_TRANSMITTER, new BESAsciiTransmit());
-
-
-
-    BESDebug::Register("ascii");
-    BESDEBUG("ascii", "Done Initializing module " << modname << endl);
+    BESDEBUG("ascii", "Done Initializing OPeNDAP Ascii module " << modname << endl);
 }
 
 void BESAsciiModule::terminate(const string &modname)
 {
-    BESDEBUG("ascii", "Cleaning module " << modname << endl);
-
-    BESDEBUG( "fojson", "    removing " << ASCII_TRANSMITTER << " transmitter" << endl );
-    BESReturnManager::TheManager()->del_transmitter(ASCII_TRANSMITTER);
-
-    // BESDEBUG( "fojson", "    removing " << DAP4_CSV_TRANSMITTER << " transmitter" << endl );
-    // BESReturnManager::TheManager()->del_transmitter(DAP4_CSV_TRANSMITTER);
-
-
-    BESDEBUG("ascii", "    removing " << modname << " request handler " << endl);
-    BESRequestHandler *rh = BESRequestHandlerList::TheList()->remove_handler(modname);
-    if (rh)
-        delete rh;
-
-
-
-#if 0
+    BESDEBUG("ascii", "Cleaning OPeNDAP Ascii module " << modname << endl);
     BESDEBUG("ascii", "    removing " << modname << " request handler " << endl);
 
     BESRequestHandler *rh = BESRequestHandlerList::TheList()->remove_handler(modname);
@@ -136,10 +102,8 @@ void BESAsciiModule::terminate(const string &modname)
         BESDEBUG("ascii", "    removing http " << ASCII_TRANSMITTER << " transmit function" << endl);
         t->remove_method(ASCII_TRANSMITTER);
     }
-#endif
 
-
-    BESDEBUG("ascii", "Done Cleaning module " << modname << endl);
+    BESDEBUG("ascii", "Done Cleaning OPeNDAP Ascii module " << modname << endl);
 }
 
 /** @brief dumps information about this object

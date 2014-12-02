@@ -38,7 +38,6 @@
 #include <escaping.h>
 #include <mime_util.h>
 
-#include <BESDapNames.h>
 #include <BESDataNames.h>
 #include <BESDapTransmit.h>
 #include <BESContainer.h>
@@ -52,16 +51,6 @@
 #include "get_ascii.h"
 
 using namespace dap_asciival;
-
-
-
-
-BESAsciiTransmit::BESAsciiTransmit() : BESBasicTransmitter() {
-
-	add_method(DATA_SERVICE, BESAsciiTransmit::send_basic_ascii);
-    // add_method(DAP4DATA_SERVICE,  BESAsciiTransmit::send_basic_ascii);
-
-}
 
 void BESAsciiTransmit::send_basic_ascii(BESResponseObject * obj, BESDataHandlerInterface & dhi)
 {
