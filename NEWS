@@ -1,3 +1,8 @@
+Version 4.1.6
+
+Applied LARC patch
+Fixes for the 'Get as NetCDF4' button on the HTML page.
+
 Version 4.1.5
 
 Memory leak fixes in asciival.
@@ -8,7 +13,9 @@ Build fixes for OSX 10.9 and namespace stuff.
 
 Version 4.1.3
 
-Added an explicit encoding type so that the set_mime_*() functions could differentiate between the new code moved to mime_util.cc/.h from ResponseBuilder and the old, deprecated, code already in mime_util.
+Added an explicit encoding type so that the set_mime_*() functions
+could differentiate between the new code moved to mime_util.cc/.h from
+ResponseBuilder and the old, deprecated, code already in mime_util.
 
 Version 4.1.2
 
