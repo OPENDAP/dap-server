@@ -8,6 +8,10 @@
 AUTOMAKE_OPTIONS = foreign check-news
 ACLOCAL_AMFLAGS = -I conf
 
+# Set the module version here, in the spec file and in configure.ac
+M_NAME=dap-server/usage
+M_VER=4.1.5
+
 if DAP_MODULES
 AM_CPPFLAGS = -I$(top_srcdir)/dispatch -I$(top_srcdir)/dap $(DAP_CFLAGS)
 LIBADD = $(DAP_SERVER_LIBS) $(DAP_CLIENT_LIBS)
@@ -15,6 +19,8 @@ else
 AM_CPPFLAGS = $(BES_CPPFLAGS)
 LIBADD = $(BES_DAP_LIBS)
 endif
+
+AM_CPPFLAGS += -DMODULE_NAME=\"$(M_NAME)\" -DMODULE_VERSION=\"$(M_VER)\"
 
 SUBDIRS = . asciival www-interface
 

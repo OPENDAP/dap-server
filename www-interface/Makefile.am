@@ -7,6 +7,10 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+# Set the module version here, in the spec file and in configure.ac
+M_NAME=dap-server/www
+M_VER=4.1.5
+
 if DAP_MODULES
 AM_CPPFLAGS = -I$(top_srcdir)/dispatch -I$(top_srcdir)/dap \
 -I$(top_srcdir)/xmlcommand -I$(top_srcdir) $(DAP_CFLAGS)
@@ -15,6 +19,8 @@ else
 AM_CPPFLAGS = -I$(top_srcdir)  $(BES_CPPFLAGS)
 LIBADD = $(BES_DAP_LIBS)
 endif
+
+AM_CPPFLAGS += -DMODULE_NAME=\"$(M_NAME)\" -DMODULE_VERSION=\"$(M_VER)\"
 
 # These are not used by automak but are often useful for certain types of
 # debugging.
