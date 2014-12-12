@@ -6,7 +6,20 @@
 # $Id$
 
 AUTOMAKE_OPTIONS = foreign
+
+# Set the module version here, in the spec file and in configure.ac
+M_NAME=dap-server/ascii
+M_VER=4.1.5
+
+if DAP_MODULES
+AM_CPPFLAGS = -I$(top_srcdir)/dispatch -I$(top_srcdir)/dap -I$(top_srcdir) $(DAP_CFLAGS)
+LIBADD = $(BES_DAP_LIBS) $(DAP_SERVER_LIBS) $(DAP_CLIENT_LIBS)
+else
 AM_CPPFLAGS = -I$(top_srcdir)
+LIBADD = $(BES_DAP_LIBS)
+endif
+
+AM_CPPFLAGS += -DMODULE_NAME=\"$(M_NAME)\" -DMODULE_VERSION=\"$(M_VER)\"
 
 # These are not used by automake but are often useful for certain types of
 # debugging.
@@ -19,9 +32,8 @@ lib_besdir=$(libdir)/bes
 lib_bes_LTLIBRARIES = libascii_module.la
 
 libascii_module_la_SOURCES = $(ASCII_SOURCES) $(BES_SOURCES)
-libascii_module_la_CPPFLAGS = $(BES_CPPFLAGS)
 libascii_module_la_LDFLAGS = -avoid-version -module 
-libascii_module_la_LIBADD = $(BES_DAP_LIBS)
+libascii_module_la_LIBADD = $(LIBADD)
 
 ASCII_SOURCES = AsciiArray.cc AsciiInt16.cc AsciiStructure.cc		   \
 		AsciiInt32.cc AsciiUInt16.cc AsciiByte.cc AsciiOutput.cc   \

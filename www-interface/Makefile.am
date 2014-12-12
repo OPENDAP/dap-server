@@ -7,7 +7,20 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-AM_CPPFLAGS = -I$(top_srcdir) $(BES_CPPFLAGS)
+# Set the module version here, in the spec file and in configure.ac
+M_NAME=dap-server/www
+M_VER=4.1.5
+
+if DAP_MODULES
+AM_CPPFLAGS = -I$(top_srcdir)/dispatch -I$(top_srcdir)/dap \
+-I$(top_srcdir)/xmlcommand -I$(top_srcdir) $(DAP_CFLAGS)
+LIBADD = $(DAP_SERVER_LIBS) $(DAP_CLIENT_LIBS)
+else
+AM_CPPFLAGS = -I$(top_srcdir)  $(BES_CPPFLAGS)
+LIBADD = $(BES_DAP_LIBS)
+endif
+
+AM_CPPFLAGS += -DMODULE_NAME=\"$(M_NAME)\" -DMODULE_VERSION=\"$(M_VER)\"
 
 # These are not used by automak but are often useful for certain types of
 # debugging.
@@ -18,9 +31,8 @@ lib_besdir=$(libdir)/bes
 lib_bes_LTLIBRARIES = libwww_module.la
 
 libwww_module_la_SOURCES = $(WWW_SOURCES) $(BES_SOURCES)
-libwww_module_la_CPPFLAGS = $(BES_CPPFLAGS)
 libwww_module_la_LDFLAGS = -avoid-version -module 
-libwww_module_la_LIBADD = $(BES_DAP_LIBS)
+libwww_module_la_LIBADD = $(LIBADD)
 
 BUILT_SOURCES = javascript.h
 
