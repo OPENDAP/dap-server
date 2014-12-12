@@ -19,6 +19,8 @@ lex.*.cc
 *.trs
 
 .dirstamp
+.cproject
+.project
 
 Makefile
 Makefile.in
