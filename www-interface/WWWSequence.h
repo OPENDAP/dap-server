@@ -52,7 +52,7 @@ public:
 
     virtual BaseType *ptr_duplicate();
 
-    virtual int length();
+    virtual int length() const;
 #ifdef FILE_METHODS
     virtual void print_val(FILE *os, string space = "",
 			   bool print_decl_p = true);

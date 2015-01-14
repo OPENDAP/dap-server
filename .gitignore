@@ -52,6 +52,11 @@ atlocal
 dap-server.conf
 www-interface/javascript.h
 www-interface/js2h.pl
+
 asciival/unit-tests/AsciiArrayTest
 asciival/unit-tests/AsciiOutputTest
 asciival/unit-tests/test_config.h
+
+asciival/tests/ASCII_HandlerTest
+asciival/tests/bes.conf
+asciival/tests/package.m4

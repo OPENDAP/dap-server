@@ -76,7 +76,7 @@ WWWSequence::~WWWSequence()
 {
 }
 
-int WWWSequence::length()
+int WWWSequence::length() const
 {
     return -1;
 }

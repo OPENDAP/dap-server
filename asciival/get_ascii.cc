@@ -56,6 +56,7 @@ using std::endl ;
 #include "AsciiGrid.h"
 
 namespace dap_asciival {
+
 /** Using the AsciiOutput::print_ascii(), write the data values to an
     output file/stream as ASCII.
 
