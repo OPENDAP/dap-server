@@ -21,6 +21,7 @@ lex.*.cc
 .dirstamp
 .cproject
 .project
+.DS_Store
 
 Makefile
 Makefile.in
@@ -57,6 +58,6 @@ asciival/unit-tests/AsciiArrayTest
 asciival/unit-tests/AsciiOutputTest
 asciival/unit-tests/test_config.h
 
-asciival/tests/ASCII_HandlerTest
+asciival/tests/ASCII_HandlerTest*
 asciival/tests/bes.conf
 asciival/tests/package.m4
