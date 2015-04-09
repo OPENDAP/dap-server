@@ -42,8 +42,12 @@ libusage_module_la_SOURCES = $(USAGE_SOURCES) $(BES_SOURCES)
 libusage_module_la_LDFLAGS = -avoid-version -module 
 libusage_module_la_LIBADD = $(LIBADD) # $(BES_DAP_LIBS)
 
-EXTRA_DIST = COPYING COPYRIGHT_URI dap-server.spec README \
+EXTRA_DIST = COPYING COPYRIGHT_URI README \
 	dap-server.conf.in OSX_Resources
+
+if !DAP_MODULES
+EXTRA_DIST += dap-server.spec
+endif
 
 DISTCLEANFILES = stamp-nph-dods dap-server.conf
 

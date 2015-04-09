@@ -1,7 +1,7 @@
 
 # Tests
 
-AUTOMAKE_OPTIONS = foreign
+AUTOMAKE_OPTIONS = foreign subdir-objects
 
 if DAP_MODULES
 AM_CPPFLAGS = -I$(top_srcdir)/dispatch -I$(top_srcdir)/dap \
@@ -37,7 +37,7 @@ EXTRA_DIST = testsuite test_config.h.in
 
 CLEANFILES = 
 
-DISTCLEANFILES = *.Po test_config.h
+DISTCLEANFILES = test_config.h
 
 ############################################################################
 # Unit Tests
