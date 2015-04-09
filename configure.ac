@@ -3,7 +3,7 @@ dnl -*- autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.69)
-AC_INIT(dap-server, 4.1.6, opendap-tech@opendap.org)
+AC_INIT(dap-server, 4.2.0, opendap-tech@opendap.org)
 AC_CONFIG_AUX_DIR([conf])
 AC_CONFIG_MACRO_DIR([conf])
 

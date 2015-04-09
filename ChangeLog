@@ -1,3 +1,141 @@
+2015-03-30  James Gallagher  <jgallagher@opendap.org>
+
+	Bumped up the version info.
+	The Makefile.am holds the version info that is returned by
+	bescmdln "show version;" and it was behind the value in
+	configure. I can see this is going to be a pain...
+
+2015-03-19  James Gallagher  <jgallagher@opendap.org>
+
+	Modified Makefile.am for distcheck combined with the modules build of the BES
+
+2015-03-10  James Gallagher  <jgallagher@opendap.org>
+
+	BESAsciiTransmit now works with server functions
+	I moved basic code and logic from BESDapResponseBuilder
+	send_dap2_data() into send_basic_ascii(). It's still a little raw, but
+	all the tests pass and server functions work including functions used
+	in combination with selection expressions against Sequences.
+
+2015-02-11  James Gallagher  <jgallagher@opendap.org>
+
+	Added to gitignore
+
+2015-01-16  James Gallagher  <jgallagher@opendap.org>
+
+	Removed dist-hook which as a hack for SVN
+
+2015-01-14  James Gallagher  <jgallagher@opendap.org>
+
+	Removed some old files after the DAP4 merge.
+
+	Merge remote-tracking branch 'origin/dap4'
+	Conflicts:
+		configure.ac
+	Fixed the conflicts and copied over the lost file handler_tests_macros.m4
+	in asciival/tests. The tests, a good example of how to use data responses
+	instead of invoking a handler on a real data file, now work.
+
+2014-12-12  James Gallagher  <jgallagher@opendap.org>
+
+	Fixed asciival/Makefile.am
+	It was missing the bes include dirs
+
+	Merge remote-tracking branch 'origin/modules'
+	Conflicts:
+		.gitignore
+
+2014-12-03  James Gallagher  <jgallagher@opendap.org>
+
+	Version number fix for the modules build.
+	See the long comment in/for csv_handler.
+
+	Bumped the version up to 4.1.6.
+
+2014-12-02  James Gallagher  <jgallagher@opendap.org>
+
+	Added dap-server.conf to ignore
+
+2014-11-26  James Gallagher  <jgallagher@opendap.org>
+
+	Aplied patch from LARC
+	This was a second patch from LARC and had to be partly applied by hand.
+
+2014-11-24  James Gallagher  <jgallagher@opendap.org>
+
+	Tweaked the config.status dep so that it includes $(top_srcdir).
+
+	Applied patch from LARC to the HTML form.
+
+2014-11-22  James Gallagher  <jgallagher@opendap.org>
+
+	Changes for the bes modules branch.
+	The Makefile.am files and configure.ac have been modifid so that
+	the handler can build as part of the bes modules 'unified' build
+	as well as the standard build.
+
+2014-11-21  James Gallagher  <jgallagher@opendap.org>
+
+	Now builds as part of the unified build
+	Modified the Makefile.am files so that they work with both the
+	statndard and unified builds. Added DAP_MODULES automake conditional
+	to configure.ac. Added gitignore.
+
+2014-09-18  Nathan Potter  <ndp@opendap.org>
+
+	dap-server: Changed Get as NetCDF-4 button to utilize the DAP2 based response (which works without DAP4 BES changes).
+
+2014-09-16  James Gallagher  <jgallagher@opendap.org>
+
+	Removed the old OPENDAP_DEBUG_OPTIONS macro from many configure.ac files. Subclasses for/of Sequence were not defining the length() virtual method correctly - adding 'const' quieted the warning. Fileout GDAL had an unneeded param (ConstraintEvaluator).
+
+2014-09-12  James Gallagher  <jgallagher@opendap.org>
+
+	Removed some unneeded #defines in the Module class; removed an old relic from the dejaGNU testing framework; and tried (worked) some new setContext values in a bescmd test input file.
+
+	Decided to punt on the newline issue with arrays of structures and such - made a ticket that we need to stop and think about how CSV data are formatted given that CSV is flat and were serializing structured data...
+
+2014-09-11  James Gallagher  <jgallagher@opendap.org>
+
+	Added tests for asciival for DAP4; one fails where an extra endl is printed when a structure contains an array. See the comment in print_strucure_ascii().
+
+	Added
+
+	removed the old ResponseHandler code (see old_and_in_the_way) and forgot to clean up the AsciiModule class and remove the include.
+
+	Added support for DAP4. Note that nested sequences are broken in libdap, so they are broken here too.
+
+	Added some test data (used with the dapreader handler) and input files to trigger their reads. NB: Nested sequences are broken in libdap as of now and some of the data/input files were used to look into that issue. It may be that code here is broken WRT nested seqs (almost certainly the case) but it's definitely broken in libdap, so this won't work on that case until libdap is fixed.
+
+	fixed comments and removed some unused params
+
+2014-09-09  James Gallagher  <jgallagher@opendap.org>
+
+	data file added for tests; configure.ac updated.
+
+	Simple types, Arrays and Structures now work for DAP4 in asciival.
+
+	Added regression tests using dapreader and a saved .dods response from the fnoc1 dataset. Using this, tests can use a .dods (DataDDS) response from a netCDF file w/o the netCDF handler being loaded into the BES.
+
+2014-08-26  Nathan Potter  <ndp@opendap.org>
+
+	dap-server: Atring dap4 implmentation of asciival
+
+2014-08-25  Nathan Potter  <ndp@opendap.org>
+
+	dap-server: Creating dap4 branch in which to add dap4 capabilities.
+
+	dap-server: Made the DAP2 ASCII response a 'returnAs' parameter for the DAP2 Data response.
+
+2014-08-01  James Gallagher  <jgallagher@opendap.org>
+
+	Release 4.1.5 checklist
+	M    ChangeLog
+	M    INSTALL
+	M    NEWS
+	M    README
+	M    configure.ac
+	M    dap-server.spec
 2014-07-31  James Gallagher <jgallagher@opendap.org>
 
 	Cleaned up some of the error messages
