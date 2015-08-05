@@ -2,7 +2,7 @@
 # 
 # These macros are used for the asciival tests.
 
-AT_INIT([bes.conf besstandalone getdap])
+AT_INIT([asciival])
 # AT_COPYRIGHT([])
 
 AT_TESTED([besstandalone])
