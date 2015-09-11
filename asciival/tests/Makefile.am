@@ -13,13 +13,13 @@ TEST_COV_FLAGS = -ftest-coverage -fprofile-arcs
 
 noinst_DATA = bes.conf
 
-CLEANFILES = *.log *.sum $(srcdir)/package.m4 
+CLEANFILES = *.log *.sum $(TESTSUITE) $(srcdir)/package.m4 
 
 EXTRA_DIST = ascii data $(TESTSUITE) $(TESTSUITE).at \
 atlocal.in bes.conf.in bes.conf.modules.in \
-handler_tests_macros.m4
+handler_tests_macros.m4 $(srcdir)/package.m4
 
-DISTCLEANFILES = bes.conf
+DISTCLEANFILES = bes.conf atconfig
 
 if DAP_MODULES
 BES_CONF_IN = bes.conf.modules.in
@@ -35,7 +35,6 @@ bes.conf: $(BES_CONF_IN) $(top_srcdir)/configure.ac
 	sed -e "s%[@]abs_top_srcdir[@]%$$clean_abs_top_srcdir%" \
 		-e "s%[@]abs_top_builddir[@]%${abs_top_builddir}%" $< > bes.conf
 
-
 ############## Autotest follows #####################
 
 AUTOM4TE = autom4te
@@ -47,16 +46,12 @@ check-local: atconfig atlocal $(srcdir)/package.m4 $(TESTSUITE)
 
 clean-local:
 	test ! -f '$(TESTSUITE)' || $(SHELL) '$(TESTSUITE)' --clean
-	-rm $(srcdir)/package.m4
-
-distclean-local:
-	-rm atconfig
 
 AUTOTEST = $(AUTOM4TE) --language=autotest
 
 % : %.at
 	$(AUTOTEST) -I '$(srcdir)' -o $@ $@.at
-	
+
 # The `:;' works around a Bash 3.2 bug when the output is not writeable.
 $(srcdir)/package.m4: $(top_srcdir)/configure.ac
 	:;{ \
@@ -67,4 +62,3 @@ $(srcdir)/package.m4: $(top_srcdir)/configure.ac
 	echo 'm4_define([AT_PACKAGE_STRING],    [@PACKAGE_STRING@])' && \
 	echo 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
 	} >'$(srcdir)/package.m4'
-	
