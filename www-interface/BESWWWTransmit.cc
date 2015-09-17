@@ -60,11 +60,10 @@ void BESWWWTransmit::send_basic_form(BESResponseObject * obj, BESDataHandlerInte
 		BESDEBUG("www", "converting dds to www dds" << endl);
 
 		DDS *dds = dynamic_cast<BESWWW*>(obj)->get_dds()->get_dds();
+		if (!dds) throw BESInternalFatalError("Expected a DDS instance", __FILE__, __LINE__);
+
 		DDS *wwwdds = dds_to_www_dds(dds);
-#if 0
-		DAS *das = dynamic_cast<BESWWW*>(obj)->get_das()->get_das();
-		wwwdds->transfer_attributes( das );
-#endif
+
 		BESDEBUG("www", "writing form" << endl);
 
 		string url = dhi.data[WWW_URL];

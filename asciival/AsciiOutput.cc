@@ -49,12 +49,12 @@ using namespace dap_asciival;
 string AsciiOutput::get_full_name()
 {
     BaseType *this_btp = dynamic_cast < BaseType * >(this);
+    if (!this_btp)
+        throw InternalErr(__FILE__, __LINE__,
+                          "Instance of AsciiOuput must also be a BaseType.");
     BaseType *btp = _redirect;
     if (!btp)
         btp = this_btp;
-    if (!btp)
-        throw InternalErr(__FILE__, __LINE__,
-                          "Instance of AsciiOuput must also be a BaseType.");
 
     BaseType *btp2 = this_btp->get_parent();
     if (!btp2)

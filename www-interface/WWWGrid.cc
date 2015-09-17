@@ -107,6 +107,7 @@ WWWGrid::do_print_val(ostream &ss)
         << ": " << fancy_typename(this) << "<br>\n\n";
 
     Array *a = dynamic_cast < Array * >(array_var());
+    if (!a) throw InternalErr(__FILE__, __LINE__, "Expected an Array");
 
     Array::Dim_iter p = a->dim_begin();
     for (int i = 0; p != a->dim_end(); ++i, ++p) {

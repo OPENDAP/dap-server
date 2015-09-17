@@ -157,8 +157,13 @@ void AsciiGrid::print_grid(ostream &strm, bool print_name)
     }
     // Grab the Grid's array
     Array *grid_array = dynamic_cast<Array *> (g->array_var());
+    if (!grid_array) throw InternalErr(__FILE__, __LINE__, "Expected an Array");
+
     AsciiArray *a_grid_array = dynamic_cast<AsciiArray *> (array_var());
+    if (!a_grid_array) throw InternalErr(__FILE__, __LINE__, "Expected an AsciiArray");
+
     AsciiOutput *ao_grid_array = dynamic_cast<AsciiOutput *> (a_grid_array);
+    if (!ao_grid_array) throw InternalErr(__FILE__, __LINE__, "Expected an AsciiOutput");
 
     // Set up the shape and state vectors. Shape holds the shape of this
     // array, state holds the index of the current vector to print.
@@ -202,8 +207,13 @@ void AsciiGrid::print_grid(ostream &strm, bool print_name)
         Grid::Map_iter ap = map_begin();
         while (state_iter != state.end()) {
             Array *map = dynamic_cast<Array *> (*p);
+            if (!map) throw InternalErr(__FILE__, __LINE__, "Expected an Array");
+
             AsciiArray *amap = dynamic_cast<AsciiArray *> (*ap);
+            if (!amap) throw InternalErr(__FILE__, __LINE__, "Expected an AsciiArray");
+
             AsciiOutput *aomap = dynamic_cast<AsciiOutput *> (amap);
+            if (!aomap) throw InternalErr(__FILE__, __LINE__, "Expected an AsciiOutput");
 
             strm << "[" << aomap->get_full_name() << "=";
             BaseType *avar = basetype_to_asciitype(map->var(*state_iter));

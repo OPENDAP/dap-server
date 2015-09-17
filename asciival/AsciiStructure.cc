@@ -1,4 +1,3 @@
-
 // -*- mode: c++; c-basic-offset:4 -*-
 
 // This file is part of asciival, software which can return an ASCII
@@ -53,12 +52,13 @@ AsciiStructure::ptr_duplicate()
     return new AsciiStructure(*this);
 }
 
-AsciiStructure::AsciiStructure(const string &n) : Structure(n)
+AsciiStructure::AsciiStructure(const string &n) :
+    Structure(n)
 {
 }
 
-AsciiStructure::AsciiStructure( Structure *bt )
-    : Structure( bt->name() ), AsciiOutput( bt )
+AsciiStructure::AsciiStructure(Structure *bt) :
+    Structure(bt->name()), AsciiOutput(bt)
 {
     // Let's make the alternative structure of Ascii types now so that we
     // don't have to do it on the fly. This will also set the parents of
@@ -80,49 +80,44 @@ AsciiStructure::~AsciiStructure()
 {
 }
 
-void
-AsciiStructure::print_header(ostream &strm)
+void AsciiStructure::print_header(ostream &strm)
 {
     Vars_iter p = var_begin();
     while (p != var_end()) {
-	if ((*p)->is_simple_type())
-	    strm << dynamic_cast<AsciiOutput*>(*p)->get_full_name() ;
-	else if ((*p)->type() == dods_structure_c)
-	    dynamic_cast<AsciiStructure*>((*p))->print_header(strm);
-	// May need a case here for Sequence 2/18/2002 jhrg
-	// Yes, we do, and for Grid as well. 04/04/03 jhrg
-	else
-	    throw InternalErr(__FILE__, __LINE__,
-			      "Support for ASCII output of datasets with structures which contain Sequences or Grids has not been completed.");
-	if (++p != var_end())
-	    strm << ", " ;
+        if ((*p)->is_simple_type())
+            strm << dynamic_cast<AsciiOutput&>(**p).get_full_name();
+        else if ((*p)->type() == dods_structure_c)
+            dynamic_cast<AsciiStructure&>(**p).print_header(strm);
+        // May need a case here for Sequence 2/18/2002 jhrg
+        // Yes, we do, and for Grid as well. 04/04/03 jhrg
+        else
+            throw InternalErr(__FILE__, __LINE__,
+                "Support for ASCII output of datasets with structures which contain Sequences or Grids has not been completed.");
+        if (++p != var_end()) strm << ", ";
     }
 }
 
-void
-AsciiStructure::print_ascii(ostream &strm, bool print_name) throw(InternalErr)
+void AsciiStructure::print_ascii(ostream &strm, bool print_name) throw (InternalErr)
 {
     BESDEBUG("ascii", "In 'AsciiStructure::print_ascii'" << endl);
 
     if (is_linear()) {
-	if (print_name) {
-	    print_header(strm);
-	    strm << "\n" ;
-	}
+        if (print_name) {
+            print_header(strm);
+            strm << "\n";
+        }
 
-	Vars_iter p = var_begin();
+        Vars_iter p = var_begin();
         while (p != var_end()) {
-            if ((*p)->send_p())
-                dynamic_cast<AsciiOutput*> ((*p))->print_ascii(strm, false);
+            if ((*p)->send_p()) dynamic_cast<AsciiOutput*>((*p))->print_ascii(strm, false);
 
-            if (++p != var_end())
-                strm << ", ";
+            if (++p != var_end()) strm << ", ";
         }
     }
     else {
         for (Vars_iter p = var_begin(); p != var_end(); ++p) {
             if ((*p)->send_p()) {
-                dynamic_cast<AsciiOutput*> ((*p))->print_ascii(strm, true);
+                dynamic_cast<AsciiOutput&>(**p).print_ascii(strm, true);
                 // This line outputs an extra endl when print_ascii is called for
                 // nested structures because an endl is written for each member
                 // and then once for the structure itself. 9/14/2001 jhrg

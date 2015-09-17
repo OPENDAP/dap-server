@@ -54,9 +54,9 @@ void
  BESUsageTransmit::send_basic_usage(BESResponseObject * obj,
                                     BESDataHandlerInterface & dhi)
 {
-    BESUsage *usage = dynamic_cast < BESUsage * >(obj);
-    DAS *das = usage->get_das()->get_das();
-    DDS *dds = usage->get_dds()->get_dds();
+    BESUsage &usage = dynamic_cast < BESUsage & >(*obj);
+    DAS *das = usage.get_das()->get_das();
+    DDS *dds = usage.get_dds()->get_dds();
 
     dhi.first_container();
 
