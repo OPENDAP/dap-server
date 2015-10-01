@@ -197,7 +197,7 @@ public:
 CPPUNIT_TEST_SUITE_REGISTRATION(AsciiArrayTest);
 
 int 
-main( int argc, char* argv[] )
+main( int , char*[] )
 {
     CppUnit::TextTestRunner runner;
     runner.addTest( CppUnit::TestFactoryRegistry::getRegistry().makeTest() );
