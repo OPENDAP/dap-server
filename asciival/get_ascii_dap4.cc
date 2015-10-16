@@ -418,19 +418,11 @@ static void print_values_as_ascii(D4Group *group, bool print_name, ostream &strm
 	for (Constructor::Vars_iter i = group->var_begin(), e = group->var_end(); i != e; ++i) {
 		// Only send the stuff in the current subset.
 		if ((*i)->send_p()) {
-			checksum.Reset();
-
-			(*i)->intern_data(checksum);
+			(*i)->intern_data();
 
 			// print the data
 			print_values_as_ascii((*i), print_name, strm, checksum);
 			strm << endl;
-
-			// Print the checksum: name():DAP4_Checksum_CRC32, checksum value
-		    ostringstream oss;
-		    oss.setf(ios::hex, ios::basefield);
-		    oss << setfill('0') << setw(8) << checksum.GetCrc32();
-		    strm << (*i)->FQN() << ":DAP4_Checksum_CRC32, " << oss.str() << endl;
 		}
 	}
 }
