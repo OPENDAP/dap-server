@@ -123,7 +123,7 @@ void AsciiSequence::print_ascii_row(ostream &strm, int row, BaseTypeRow outer_va
                     else
                         first_var = false;
 
-                    dynamic_cast<AsciiSequence *>(abt_ptr)->print_ascii_rows(strm, outer_vars);
+                    dynamic_cast<AsciiSequence&>(*abt_ptr).print_ascii_rows(strm, outer_vars);
                 }
             }
             else {

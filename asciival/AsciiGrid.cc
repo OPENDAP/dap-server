@@ -217,8 +217,8 @@ void AsciiGrid::print_grid(ostream &strm, bool print_name)
 
             strm << "[" << aomap->get_full_name() << "=";
             BaseType *avar = basetype_to_asciitype(map->var(*state_iter));
-            AsciiOutput *aovar = dynamic_cast<AsciiOutput *> (avar);
-            aovar->print_ascii(strm, false);
+            AsciiOutput &aovar = dynamic_cast<AsciiOutput &> (*avar);
+            aovar.print_ascii(strm, false);
             // we aren't saving a var for future reference so need to delete
             delete avar;
             strm << "]";

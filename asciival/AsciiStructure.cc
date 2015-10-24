@@ -109,7 +109,7 @@ void AsciiStructure::print_ascii(ostream &strm, bool print_name) throw (Internal
 
         Vars_iter p = var_begin();
         while (p != var_end()) {
-            if ((*p)->send_p()) dynamic_cast<AsciiOutput*>((*p))->print_ascii(strm, false);
+            if ((*p)->send_p()) dynamic_cast<AsciiOutput &>(**p).print_ascii(strm, false);
 
             if (++p != var_end()) strm << ", ";
         }
