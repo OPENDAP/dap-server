@@ -16,7 +16,7 @@ if DAP_MODULES
 AM_CPPFLAGS = -I$(top_srcdir)/dispatch -I$(top_srcdir)/dap $(DAP_CFLAGS)
 LIBADD = $(DAP_SERVER_LIBS) $(DAP_CLIENT_LIBS)
 else
-AM_CPPFLAGS = $(BES_CPPFLAGS)
+AM_CPPFLAGS = $(BES_CPPFLAGS) $(DAP_CFLAGS)
 LIBADD = $(BES_DAP_LIBS)
 endif
 
