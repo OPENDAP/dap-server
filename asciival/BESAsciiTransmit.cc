@@ -53,7 +53,9 @@
 #include <BESDMRResponse.h>
 #include <BESDapResponseBuilder.h>
 
+#include <BESError.h>
 #include <BESDapError.h>
+#include <BESForbiddenError.h>
 #include <BESInternalFatalError.h>
 
 #include <BESDebug.h>
@@ -204,12 +206,13 @@ void BESAsciiTransmit::send_basic_ascii(BESResponseObject *obj, BESDataHandlerIn
         delete ascii_dds;
     }
     catch (InternalErr &e) {
-        throw BESDapError("Failed to get values as ascii: " + e.get_error_message(), true, e.get_error_code(), __FILE__,
-            __LINE__);
+        throw BESDapError("Failed to get values as ascii: " + e.get_error_message(), true, e.get_error_code(), __FILE__,  __LINE__);
     }
     catch (Error &e) {
-        throw BESDapError("Failed to get values as ascii: " + e.get_error_message(), false, e.get_error_code(),
-            __FILE__, __LINE__);
+        throw BESDapError("Failed to get values as ascii: " + e.get_error_message(), false, e.get_error_code(), __FILE__, __LINE__);
+    }
+    catch (BESError &e){
+        throw BESError("Failed to get values as ascii: " + e.get_message(), e.get_error_type(), __FILE__, __LINE__);
     }
     catch (...) {
         throw BESInternalFatalError("Failed to get values as ascii: Unknown exception caught", __FILE__, __LINE__);
