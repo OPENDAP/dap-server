@@ -264,6 +264,9 @@ void BESAsciiTransmit::send_dap4_csv(BESResponseObject *obj, BESDataHandlerInter
         throw BESDapError("Failed to return values as ascii: " + e.get_error_message(), false, e.get_error_code(),
                 __FILE__, __LINE__);
     }
+    catch (BESError &e){
+        throw BESError("Failed to get values as ascii: " + e.get_message(), e.get_error_type(), __FILE__, __LINE__);
+    }
     catch (...) {
         throw BESInternalFatalError("Failed to return values as ascii: Unknown exception caught", __FILE__, __LINE__);
     }
