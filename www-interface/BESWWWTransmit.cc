@@ -43,6 +43,7 @@
 #include <BESWWW.h>
 #include <util.h>
 #include <InternalErr.h>
+#include <BESError.h>
 #include <BESDapError.h>
 #include <BESInternalFatalError.h>
 #include <BESServiceRegistry.h>
@@ -86,10 +87,13 @@ void BESWWWTransmit::send_basic_form(BESResponseObject * obj, BESDataHandlerInte
 		string err = "Failed to write html form: " + e.get_error_message();
 		throw BESDapError(err, true, e.get_error_code(), __FILE__, __LINE__);
 	}
-	catch (Error &e) {
-		string err = "Failed to write html form: " + e.get_error_message();
-		throw BESDapError(err, false, e.get_error_code(), __FILE__, __LINE__);
-	}
+    catch (Error &e) {
+        string err = "Failed to write html form: " + e.get_error_message();
+        throw BESDapError(err, false, e.get_error_code(), __FILE__, __LINE__);
+    }
+    catch (BESError &e) {
+        throw;
+    }
 	catch (...) {
 		string err = "Failed to write html form: Unknown exception caught";
 		throw BESInternalFatalError(err, __FILE__, __LINE__);

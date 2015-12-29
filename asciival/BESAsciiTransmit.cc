@@ -205,17 +205,14 @@ void BESAsciiTransmit::send_basic_ascii(BESResponseObject *obj, BESDataHandlerIn
         dhi.get_output_stream() << flush;
         delete ascii_dds;
     }
-    catch (InternalErr &e) {
-        throw BESDapError("Failed to get values as ascii: " + e.get_error_message(), true, e.get_error_code(), __FILE__,  __LINE__);
-    }
     catch (Error &e) {
         throw BESDapError("Failed to get values as ascii: " + e.get_error_message(), false, e.get_error_code(), __FILE__, __LINE__);
     }
-    catch (BESError &e){
-        throw BESError("Failed to get values as ascii: " + e.get_message(), e.get_error_type(), __FILE__, __LINE__);
+    catch (BESError &e) {
+        throw;
     }
     catch (...) {
-        throw BESInternalFatalError("Failed to get values as ascii: Unknown exception caught", __FILE__, __LINE__);
+        throw BESInternalError("Failed to get values as ascii: Unknown exception caught", __FILE__, __LINE__);
     }
 }
 
@@ -256,19 +253,14 @@ void BESAsciiTransmit::send_dap4_csv(BESResponseObject *obj, BESDataHandlerInter
         print_values_as_ascii(dmr, dhi.get_output_stream());
         dhi.get_output_stream() << flush;
     }
-    catch (InternalErr &e) {
-        throw BESDapError("Failed to return values as ascii: " + e.get_error_message(), true, e.get_error_code(),
-                __FILE__, __LINE__);
-    }
     catch (Error &e) {
-        throw BESDapError("Failed to return values as ascii: " + e.get_error_message(), false, e.get_error_code(),
-                __FILE__, __LINE__);
+        throw BESDapError("Failed to return values as ascii: " + e.get_error_message(), false, e.get_error_code(),__FILE__, __LINE__);
     }
     catch (BESError &e){
-        throw BESError("Failed to get values as ascii: " + e.get_message(), e.get_error_type(), __FILE__, __LINE__);
+        throw;
     }
     catch (...) {
-        throw BESInternalFatalError("Failed to return values as ascii: Unknown exception caught", __FILE__, __LINE__);
+        throw BESInternalError("Failed to return values as ascii: Unknown exception caught", __FILE__, __LINE__);
     }
 
     BESDEBUG("ascii", "Done BESAsciiTransmit::send_dap4_csv" << endl);

@@ -79,6 +79,9 @@ void
         string err = "Failed to write usage: " + e.get_error_message() ;
         throw BESDapError(err, false, e.get_error_code(), __FILE__, __LINE__ ) ;
     }
+    catch (BESError &e) {
+        throw;
+    }
     catch(...)
     {
         string err = "Failed to write usage: Unknown exception caught";
