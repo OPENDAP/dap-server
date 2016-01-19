@@ -244,7 +244,8 @@ void BESAsciiTransmit::send_dap4_csv(BESResponseObject *obj, BESDataHandlerInter
 
         if (!dap4Constraint.empty()) {
             D4ConstraintEvaluator d4ce(dmr);
-            d4ce.parse(dap4Constraint);
+            bool parse_ok = d4ce.parse(dap4Constraint);
+            if (!parse_ok) throw Error(d4ce.error_code(), "Constraint Expression failed to parse: " + d4ce.error_message());
         }
         else {
             dmr->root()->set_send_p(true);
@@ -256,7 +257,7 @@ void BESAsciiTransmit::send_dap4_csv(BESResponseObject *obj, BESDataHandlerInter
     catch (Error &e) {
         throw BESDapError("Failed to return values as ascii: " + e.get_error_message(), false, e.get_error_code(),__FILE__, __LINE__);
     }
-    catch (BESError &e){
+    catch (BESError &e) {
         throw;
     }
     catch (...) {
