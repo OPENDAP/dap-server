@@ -244,7 +244,8 @@ void BESAsciiTransmit::send_dap4_csv(BESResponseObject *obj, BESDataHandlerInter
 
         if (!dap4Constraint.empty()) {
             D4ConstraintEvaluator d4ce(dmr);
-            d4ce.parse(dap4Constraint);
+            bool parse_ok = d4ce.parse(dap4Constraint);
+            if (!parse_ok) throw Error(malformed_expr, "Constraint Expression (" + d_dap4ce + ") failed to parse.");
         }
         else {
             dmr->root()->set_send_p(true);
