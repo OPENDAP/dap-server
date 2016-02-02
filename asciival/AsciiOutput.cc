@@ -89,7 +89,6 @@ void AsciiOutput::print_ascii(ostream &strm,
 }
 
 // This code implements simple modulo arithmetic. The vector shape contains
-// This code implements simple modulo arithmetic. The vector shape contains
 // the maximum count value for each dimension, state contains the current
 // state. For example, if shape holds 10, 20 then when state holds 0, 20
 // calling this method will increment state to 1, 0. For this example,
