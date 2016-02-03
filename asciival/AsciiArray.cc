@@ -121,19 +121,23 @@ void AsciiArray::print_vector(ostream &strm, bool print_name)
         strm << dynamic_cast<AsciiOutput*>(this)->get_full_name() << ", " ;
 
     // only one dimension
-    int end = /*bt->*/dimension_size(/*bt->*/dim_begin(), true) - 1;
+    // Added the 'if (dimension_size...' in support of zero-length arrays.
+    // jhrg 2/2/16
+    if (dimension_size(dim_begin(), true) > 0) {
+        int end = /*bt->*/dimension_size(/*bt->*/dim_begin(), true) - 1;
 
-    for (int i = 0; i < end; ++i) {
-        BaseType *curr_var = basetype_to_asciitype(bt->var(i));
-        dynamic_cast < AsciiOutput & >(*curr_var).print_ascii(strm, false);
-        strm << ", ";
+        for (int i = 0; i < end; ++i) {
+            BaseType *curr_var = basetype_to_asciitype(bt->var(i));
+            dynamic_cast<AsciiOutput &>(*curr_var).print_ascii(strm, false);
+            strm << ", ";
+            // we're not saving curr_var for future use, so delete it here
+            delete curr_var;
+        }
+        BaseType *curr_var = basetype_to_asciitype(bt->var(end));
+        dynamic_cast<AsciiOutput &>(*curr_var).print_ascii(strm, false);
         // we're not saving curr_var for future use, so delete it here
         delete curr_var;
     }
-    BaseType *curr_var = basetype_to_asciitype(bt->var(end));
-    dynamic_cast < AsciiOutput & >(*curr_var).print_ascii(strm, false);
-    // we're not saving curr_var for future use, so delete it here
-    delete curr_var;
 }
 
 /** Print a single row of values for a N-dimensional array. Since we store
@@ -164,17 +168,20 @@ int AsciiArray::print_row(ostream &strm, int index, int number)
 
     delete abt;
 #else
-    for (int i = 0; i < number; ++i) {
+    // Added 'if (number > 0)' to support zero-length arrays. jhrg 2/2/16
+    if (number > 0) {
+        for (int i = 0; i < number; ++i) {
+            BaseType *curr_var = basetype_to_asciitype(bt->var(index++));
+            dynamic_cast<AsciiOutput &>(*curr_var).print_ascii(strm, false);
+            strm << ", ";
+            // we're not saving curr_var for future use, so delete it here
+            delete curr_var;
+        }
         BaseType *curr_var = basetype_to_asciitype(bt->var(index++));
-        dynamic_cast < AsciiOutput & >(*curr_var).print_ascii(strm, false);
-        strm << ", " ;
+        dynamic_cast<AsciiOutput &>(*curr_var).print_ascii(strm, false);
         // we're not saving curr_var for future use, so delete it here
         delete curr_var;
     }
-    BaseType *curr_var = basetype_to_asciitype(bt->var(index++));
-    dynamic_cast < AsciiOutput & >(*curr_var).print_ascii(strm, false);
-    // we're not saving curr_var for future use, so delete it here
-    delete curr_var;
 #endif
 
     return index;

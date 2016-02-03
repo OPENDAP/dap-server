@@ -70,13 +70,16 @@ static void print_array_vector(Array *a, ostream &strm, bool print_name)
         strm << a->FQN() << ", " ;
 
     // only one dimension
-    int end = a->dimension_size(a->dim_begin(), true) - 1;
+    // Added to support zero-length arrays. jhrg 2/2/16
+    if (a->dimension_size(a->dim_begin(), true) > 0) {
+        int end = a->dimension_size(a->dim_begin(), true) - 1;
 
-    for (int i = 0; i < end; ++i) {
-    	a->var(i)->print_val(strm, "", false /*print_decl*/);
-        strm << ", ";
+        for (int i = 0; i < end; ++i) {
+            a->var(i)->print_val(strm, "", false /*print_decl*/);
+            strm << ", ";
+        }
+        a->var(end)->print_val(strm, "", false /*print_decl*/);
     }
-	a->var(end)->print_val(strm, "", false /*print_decl*/);
 }
 
 /** Print a single row of values for a N-dimensional array. Since we store
@@ -92,12 +95,15 @@ static void print_array_vector(Array *a, ostream &strm, bool print_name)
     @see print\_array */
 static int print_array_row(Array *a, ostream &strm, int index, int number)
 {
-    for (int i = 0; i < number; ++i) {
-    	a->var(index++)->print_val(strm, "", false /*print_decl*/);
-        strm << ", ";
-    }
+    // Added to support zero-length arrays. jhrg 2/2/16
+    if (number > 0) {
+        for (int i = 0; i < number; ++i) {
+            a->var(index++)->print_val(strm, "", false /*print_decl*/);
+            strm << ", ";
+        }
 
-    a->var(index++)->print_val(strm, "", false /*print_decl*/);
+        a->var(index++)->print_val(strm, "", false /*print_decl*/);
+    }
     return index;
 }
 
