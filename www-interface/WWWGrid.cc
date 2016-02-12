@@ -66,7 +66,7 @@ WWWGrid::WWWGrid(Grid * grid): Grid(grid->name())
 {
     BaseType *bt = basetype_to_wwwtype(grid->array_var());
     bt->set_attr_table(grid->array_var()->get_attr_table());
-    add_var(bt, array);
+    add_var(bt, libdap::array);
     delete bt;
 
     Grid::Map_iter i = grid->map_begin();

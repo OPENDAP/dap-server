@@ -67,7 +67,11 @@ AsciiGrid::AsciiGrid(Grid *grid) :
     Grid(grid->name()), AsciiOutput(grid)
 {
     BaseType *bt = basetype_to_asciitype(grid->array_var());
-    add_var(bt, array);
+    // Added qualification for 'array' which is libdap::Part::array, but adding
+    // the full qualification results in a warning about the code being c++-11
+    // specific. The line with no qualification on 'array' does not compile on
+    // gcc 6. jhrg 2/4/16
+    add_var(bt, libdap::array);
     // add_var makes a copy of the base type passed to it, so delete it here
     delete bt;
     bt = 0;
