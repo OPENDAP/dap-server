@@ -92,7 +92,7 @@ void BESAsciiTransmit::send_basic_ascii(BESResponseObject *obj, BESDataHandlerIn
     BESDataDDSResponse *bdds = dynamic_cast<BESDataDDSResponse *>(obj);
     if (!bdds) throw BESInternalFatalError("Expected a BESDataDDSResponse instance", __FILE__, __LINE__);
 
-    try { // Expanded try block so DAP all DAP errors are caught. ndp 12/23/2015
+    try { // Expanded try block so all DAP errors are caught. ndp 12/23/2015
 
         DataDDS *dds = bdds->get_dds();
         ConstraintEvaluator &ce = bdds->get_ce();
@@ -131,6 +131,17 @@ void BESAsciiTransmit::send_basic_ascii(BESResponseObject *obj, BESDataHandlerIn
 #endif
             func_eval.parse_constraint(rb.get_btp_func_ce(), *dds);
             DataDDS *fdds = func_eval.eval_function_clauses(*dds);
+            // This next step utilizes a well known function, promote_function_output_structures()
+            // to look for one or more top level Structures whose name indicates (by way of ending
+            // with "_uwrap") that their contents should be promoted (aka moved) to the top level.
+            // This is in support of a hack around the current API where server side functions
+            // may only return a single DAP object and not a collection of objects. The name suffix
+            // "_unwrap" is used as a signal from the function to the the various response
+            // builders and transmitters that the representation needs to be altered before
+            // transmission, and that in fact is what happens in our friend
+            // promote_function_output_structures()
+            fdds = promote_function_output_structures(fdds);
+
 
             // Server functions might mark variables to use their read()
             // methods. Clear that so the CE in d_dap2ce will control what is
@@ -235,7 +246,7 @@ void BESAsciiTransmit::send_dap4_csv(BESResponseObject *obj, BESDataHandlerInter
     dhi.first_container();
 
     try {
-        // Handle *functional* constraint expressions specially
+        // @TODO Handle *functional* constraint expressions specially
         // Use the D4FunctionDriver class and evaluate the functions, building
         // an new DMR, then evaluate the D4CE in the context of that DMR.
         // This might be coded as "if (there's a function) do this else process the CE".
