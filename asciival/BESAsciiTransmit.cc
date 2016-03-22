@@ -57,6 +57,7 @@
 #include <BESDapError.h>
 #include <BESForbiddenError.h>
 #include <BESInternalFatalError.h>
+#include <DapFunctionUtils.h>
 
 #include <BESDebug.h>
 
@@ -87,12 +88,81 @@ BESAsciiTransmit::BESAsciiTransmit() :
 // methods that could be used to implement the logic uniformly.
 void BESAsciiTransmit::send_basic_ascii(BESResponseObject *obj, BESDataHandlerInterface &dhi)
 {
-    BESDEBUG("ascii", "BESAsciiTransmit::send_base_ascii; modified" << endl);
+    BESDEBUG("ascii", "BESAsciiTransmit::send_basic_ascii() - BEGIN" << endl);
 
     BESDataDDSResponse *bdds = dynamic_cast<BESDataDDSResponse *>(obj);
     if (!bdds) throw BESInternalFatalError("Expected a BESDataDDSResponse instance", __FILE__, __LINE__);
 
     try { // Expanded try block so all DAP errors are caught. ndp 12/23/2015
+
+        DataDDS *dds = bdds->get_dds();
+
+        ConstraintEvaluator &eval = bdds->get_ce();
+
+        ostream &o_strm = dhi.get_output_stream();
+        if (!o_strm)
+            throw BESInternalError("Output stream is not set, can not return as ASCII", __FILE__, __LINE__);
+
+        // ticket 1248 jhrg 2/23/09
+        string ce = www2id(dhi.data[POST_CONSTRAINT], "%", "%20%26");
+        eval.parse_constraint(ce, *dds);
+
+        dds->tag_nested_sequences(); // Tag Sequences as Parent or Leaf node.
+
+        // Is the requested stuff too big?
+        int response_size_limit = dds->get_response_limit(); // use the original DDS
+        if (response_size_limit != 0 && dds->get_request_size(true) > response_size_limit) {
+            string msg = "The Request for " + long_to_string(dds->get_request_size(true) / 1024)
+                    + "KB is too large; requests for this user are limited to "
+                    + long_to_string(response_size_limit / 1024) + "KB.";
+            throw Error(msg);
+        }
+
+        // now we need to read the data
+        BESDEBUG("ascii", "BESAsciiTransmit::send_basic_ascii() - Reading data into DataDDS" << endl);
+
+        // Handle *functional* constraint expressions specially
+        if (eval.function_clauses()) {
+            BESDEBUG("ascii", "BESAsciiTransmit::send_basic_ascii() - Processing functional constraint clause(s)." << endl);
+            DataDDS *tmp_dds = eval.eval_function_clauses(*dds);
+            delete dds;
+            dds = tmp_dds;
+            bdds->set_dds(dds);
+
+
+            // This next step utilizes a well known function, promote_function_output_structures()
+            // to look for one or more top level Structures whose name indicates (by way of ending
+            // with "_uwrap") that their contents should be promoted (aka moved) to the top level.
+            // This is in support of a hack around the current API where server side functions
+            // may only return a single DAP object and not a collection of objects. The name suffix
+            // "_unwrap" is used as a signal from the function to the the various response
+            // builders and transmitters that the representation needs to be altered before
+            // transmission, and that in fact is what happens in our friend
+            // promote_function_output_structures()
+            promote_function_output_structures(dds);
+
+        }
+        else {
+            // Iterate through the variables in the DataDDS and read
+            // in the data if the variable has the send flag set.
+            for (DDS::Vars_iter i = dds->var_begin(); i != dds->var_end(); i++) {
+                if ((*i)->send_p()) {
+                    (*i)->intern_data(eval, *dds);
+                }
+            }
+        }
+
+        // Now that we have constrained the DataDDS and read in the data,
+        // send it as ascii
+        DataDDS *ascii_dds = datadds_to_ascii_datadds(dds);
+
+        get_data_values_as_ascii(ascii_dds, dhi.get_output_stream());
+
+        dhi.get_output_stream() << flush;
+        delete ascii_dds;
+
+
+#if 0
 
         DataDDS *dds = bdds->get_dds();
         ConstraintEvaluator &ce = bdds->get_ce();
@@ -215,6 +285,8 @@ void BESAsciiTransmit::send_basic_ascii(BESResponseObject *obj, BESDataHandlerIn
 
         dhi.get_output_stream() << flush;
         delete ascii_dds;
+#endif
+
     }
     catch (Error &e) {
         throw BESDapError("Failed to get values as ascii: " + e.get_error_message(), false, e.get_error_code(), __FILE__, __LINE__);
