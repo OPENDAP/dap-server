@@ -95,7 +95,7 @@ void BESAsciiTransmit::send_basic_ascii(BESResponseObject *obj, BESDataHandlerIn
 
     try { // Expanded try block so all DAP errors are caught. ndp 12/23/2015
 
-        DataDDS *dds = bdds->get_dds();
+        DDS *dds = bdds->get_dds();
         ConstraintEvaluator &eval = bdds->get_ce();
         ostream &o_strm = dhi.get_output_stream();
 
@@ -123,7 +123,7 @@ void BESAsciiTransmit::send_basic_ascii(BESResponseObject *obj, BESDataHandlerIn
         // Handle *functional* constraint expressions specially
         if (eval.function_clauses()) {
             BESDEBUG("ascii", "BESAsciiTransmit::send_basic_ascii() - Processing functional constraint clause(s)." << endl);
-            DataDDS *tmp_dds = eval.eval_function_clauses(*dds);
+            DDS *tmp_dds = eval.eval_function_clauses(*dds);
             delete dds;
             dds = tmp_dds;
             bdds->set_dds(dds);
@@ -149,7 +149,7 @@ void BESAsciiTransmit::send_basic_ascii(BESResponseObject *obj, BESDataHandlerIn
         }
         // Now that we have constrained the DataDDS and read in the data,
         // send it as ascii
-        DataDDS *ascii_dds = datadds_to_ascii_datadds(dds);
+        DDS *ascii_dds = datadds_to_ascii_datadds(dds);
         get_data_values_as_ascii(ascii_dds, dhi.get_output_stream());
         dhi.get_output_stream() << flush;
         delete ascii_dds;
