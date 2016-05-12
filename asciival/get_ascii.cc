@@ -65,7 +65,7 @@ namespace dap_asciival {
     build such a DataDDS from one whose types are, say NCByte, et cetera.
     @param strm Write ASCII to stream. */
 void
-get_data_values_as_ascii(DataDDS *dds, ostream &strm)
+get_data_values_as_ascii(DDS *dds, ostream &strm)
 {
     BESDEBUG("ascii", "In get_data_values_as_ascii; dataset name = " << dds->get_dataset_name() << endl );
     strm << "Dataset: " << dds->get_dataset_name() << "\n" ;
@@ -82,17 +82,24 @@ get_data_values_as_ascii(DataDDS *dds, ostream &strm)
     BESDEBUG("ascii", "Out get_data_values_as_ascii" << endl );
 }
 
+#if 0
+// was... jhrg 5/12/16
 DataDDS *datadds_to_ascii_datadds(DataDDS * dds)
+#endif
+DDS *datadds_to_ascii_datadds(DDS *dds)
 {
     BESDEBUG("ascii", "In datadds_to_ascii_datadds" << endl);
     // Should the following use AsciiOutputFactory instead of the source DDS'
     // factory class? It doesn't matter for the following since the function
     // basetype_to_asciitype() doesn't use the factory. So long as no other
     // code uses the DDS' factory, this is fine. jhrg 9/5/06
+#if 0
     DataDDS *asciidds = new DataDDS(dds->get_factory(),
                                     dds->get_dataset_name(),
                                     dds->get_version(),
                                     dds->get_protocol());
+#endif
+    DDS *asciidds = new DDS(dds->get_factory(), dds->get_dataset_name());
 
     DDS::Vars_iter i = dds->var_begin();
     while (i != dds->var_end()) {
