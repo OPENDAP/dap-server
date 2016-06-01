@@ -67,7 +67,7 @@ AsciiGrid::AsciiGrid(Grid *grid) :
     Grid(grid->name()), AsciiOutput(grid)
 {
     BaseType *bt = basetype_to_asciitype(grid->array_var());
-    add_var(bt, array);
+    add_var(bt, libdap::array);
     // add_var makes a copy of the base type passed to it, so delete it here
     delete bt;
     bt = 0;
