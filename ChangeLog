@@ -1,3 +1,41 @@
+2016-05-10  James Gallagher  <jgallagher@opendap.org>
+
+	Fixed a DAP4 Sequence test
+	The test used a DDS to build a sequence; I've fixed the libdap
+	Test* classes so that D4Sequences work better and now this code
+	uses them. Using a DDS to build a D4Sequence won't work.
+
+2016-03-22  Nathan Potter  <ndp@opendap.org>
+
+	Cleaning up code for merge.
+
+2016-03-21  Nathan Potter  <ndp@opendap.org>
+
+	Tests for function result promotion in transmitters. Test function wrapitup() added.
+
+	interim commit
+
+2016-02-12  James Gallagher  <jgallagher@opendap.org>
+
+	Patch for gcc-6 from Orion Poplawski
+
+2016-02-03  James Gallagher  <jgallagher@opendap.org>
+
+	Resolved conflicts... Changes to be committed: 	modified:   asciival/tests/Makefile.am
+
+	Merge branch 'master' into hyrax_release_1.13
+
+	Merge pull request #1 from OPENDAP/BES-97
+	Added support for zero-length arrays, with tests
+
+2016-02-02  James Gallagher  <jgallagher@opendap.org>
+
+	Added support for zero-length arrays, with tests
+
+2016-01-26  James Gallagher  <jgallagher@opendap.org>
+
+	Updated ChangeLog, etc., for the bes 3.17 release
+
 2016-01-26  James Gallagher  <jgallagher@opendap.org>
 
 	Updated autotest tests, macros and Makefile.am files

@@ -57,6 +57,7 @@
 #include <BESDapError.h>
 #include <BESForbiddenError.h>
 #include <BESInternalFatalError.h>
+#include <DapFunctionUtils.h>
 
 #include <BESDebug.h>
 
@@ -87,121 +88,69 @@ BESAsciiTransmit::BESAsciiTransmit() :
 // methods that could be used to implement the logic uniformly.
 void BESAsciiTransmit::send_basic_ascii(BESResponseObject *obj, BESDataHandlerInterface &dhi)
 {
-    BESDEBUG("ascii", "BESAsciiTransmit::send_base_ascii; modified" << endl);
+    BESDEBUG("ascii", "BESAsciiTransmit::send_basic_ascii() - BEGIN" << endl);
 
     BESDataDDSResponse *bdds = dynamic_cast<BESDataDDSResponse *>(obj);
     if (!bdds) throw BESInternalFatalError("Expected a BESDataDDSResponse instance", __FILE__, __LINE__);
 
-    try { // Expanded try block so DAP all DAP errors are caught. ndp 12/23/2015
+    try { // Expanded try block so all DAP errors are caught. ndp 12/23/2015
 
         DataDDS *dds = bdds->get_dds();
-        ConstraintEvaluator &ce = bdds->get_ce();
+        ConstraintEvaluator &eval = bdds->get_ce();
+        ostream &o_strm = dhi.get_output_stream();
 
-        dhi.first_container();
+        if (!o_strm)
+            throw BESInternalError("Output stream is not set, can not return as ASCII", __FILE__, __LINE__);
 
-        string constraint = www2id(dhi.data[POST_CONSTRAINT], "%", "%20%26");
-        BESDEBUG("ascii", "parsing constraint: " << constraint << endl);
+        // ticket 1248 jhrg 2/23/09
+        string ce = www2id(dhi.data[POST_CONSTRAINT], "%", "%20%26");
+        eval.parse_constraint(ce, *dds);
 
-        BESDapResponseBuilder rb;
+        dds->tag_nested_sequences(); // Tag Sequences as Parent or Leaf node.
 
-        rb.split_ce(ce, constraint);
+        // Is the requested stuff too big?
+        int response_size_limit = dds->get_response_limit(); // use the original DDS
+        if (response_size_limit != 0 && dds->get_request_size(true) > response_size_limit) {
+            string msg = "The Request for " + long_to_string(dds->get_request_size(true) / 1024)
+                    + "KB is too large; requests for this user are limited to "
+                    + long_to_string(response_size_limit / 1024) + "KB.";
+            throw Error(msg);
+        }
 
-        // If there are functions, parse them and eval.
-        // Use that DDS and parse the non-function ce
-        // Serialize using the second ce and the second dds
-        if (!rb.get_btp_func_ce().empty()) {
-            BESDEBUG("ascii", "BESAsciiTransmit::send_base_ascii - Found function(s) in CE: " << rb.get_btp_func_ce() << endl);
+        // now we need to read the data
+        BESDEBUG("ascii", "BESAsciiTransmit::send_basic_ascii() - Reading data into DataDDS" << endl);
 
-            // Define a local ce evaluator so that the clause(s) from the function parse
-            // won't get treated like selection clauses later on when serialize is called
-            // on the DDS (fdds)
-            ConstraintEvaluator func_eval;
-
-            // FIXME Does caching work outside of the DAP module?
-#if 0
-            if (responseCache()) {
-                BESDEBUG("ascii", "BESAsciiTransmit::send_base_ascii - Using the cache for the server function CE" << endl);
-                fdds = rb.responseCache()->cache_dataset(dds, get_btp_func_ce(), this, &func_eval, cache_token);
-            }
-            else {
-                BESDEBUG("ascii", "BESAsciiTransmit::send_base_ascii - Cache not found; (re)calculating" << endl);
-                func_eval.parse_constraint(get_btp_func_ce(), dds);
-                fdds = func_eval.eval_function_clauses(dds);
-            }
-#endif
-            func_eval.parse_constraint(rb.get_btp_func_ce(), *dds);
-            DataDDS *fdds = func_eval.eval_function_clauses(*dds);
-
-            // Server functions might mark variables to use their read()
-            // methods. Clear that so the CE in d_dap2ce will control what is
-            // sent. If that is empty (there was only a function call) all
-            // of the variables in the intermediate DDS (i.e., the function
-            // result) will be sent.
-            fdds->mark_all(false);
-
-            ce.parse_constraint(rb.get_ce(), *fdds);
-
-            fdds->tag_nested_sequences(); // Tag Sequences as Parent or Leaf node.
-
-            int response_size_limit = dds->get_response_limit(); // use the original DDS
-            if (response_size_limit != 0 && fdds->get_request_size(true) > response_size_limit) {
-                string msg = "The Request for " + long_to_string(fdds->get_request_size(true) / 1024)
-                        + "KB is too large; requests for this user are limited to "
-                        + long_to_string(response_size_limit / 1024) + "KB.";
-                throw Error(msg);
-            }
-
-            // Now we have the correct values in fdds, so set the BESResponseObject so
-            // that it will reference that. At a minimum, its dtor will free the object.
-            // So, delete the initial DataDDS*
-            bdds->set_dds(fdds);
+        // Handle *functional* constraint expressions specially
+        if (eval.function_clauses()) {
+            BESDEBUG("ascii", "BESAsciiTransmit::send_basic_ascii() - Processing functional constraint clause(s)." << endl);
+            DataDDS *tmp_dds = eval.eval_function_clauses(*dds);
             delete dds;
-            dds = fdds;
-
-            // FIXME Caching broken outside of the DAP module?
-#if 0
-            if (!store_dap2_result(data_stream, dds, eval)) {
-                serialize_dap2_data_dds(data_stream, *fdds, eval, true /* was 'false'. jhrg 3/10/15 */);
-            }
-
-            if (responseCache()) responseCache()->unlock_and_close(cache_token);
-#endif
+            dds = tmp_dds;
+            bdds->set_dds(dds);
+            // This next step utilizes a well known function, promote_function_output_structures()
+            // to look for one or more top level Structures whose name indicates (by way of ending
+            // with "_uwrap") that their contents should be promoted (aka moved) to the top level.
+            // This is in support of a hack around the current API where server side functions
+            // may only return a single DAP object and not a collection of objects. The name suffix
+            // "_unwrap" is used as a signal from the function to the the various response
+            // builders and transmitters that the representation needs to be altered before
+            // transmission, and that in fact is what happens in our friend
+            // promote_function_output_structures()
+            promote_function_output_structures(dds);
         }
         else {
-            BESDEBUG("ascii", "BESAsciiTransmit::send_base_ascii - Simple constraint" << endl);
-
-            ce.parse_constraint(rb.get_ce(), *dds); // Throws Error if the ce doesn't parse.
-
-            dds->tag_nested_sequences(); // Tag Sequences as Parent or Leaf node.
-
-            if (dds->get_response_limit() != 0 && dds->get_request_size(true) > dds->get_response_limit()) {
-                string msg = "The Request for " + long_to_string(dds->get_request_size(true) / 1024)
-                        + "KB is too large; requests for this user are limited to "
-                        + long_to_string(dds->get_response_limit() / 1024) + "KB.";
-                throw Error(msg);
-            }
-
-            // FIXME Caching...
-#if 0
-            if (!store_dap2_result(data_stream, dds, eval)) {
-                serialize_dap2_data_dds(data_stream, dds, eval);
-            }
-#endif
-        }
-
-        for (DDS::Vars_iter i = dds->var_begin(); i != dds->var_end(); i++) {
-            if ((*i)->send_p()) {
-                BESDEBUG("ascii", "BESAsciiTransmit::send_base_ascii; call to intern_data() for '" << (*i)->name() << "'" << endl);
-                (*i)->intern_data(ce, *dds);
+            // Iterate through the variables in the DataDDS and read
+            // in the data if the variable has the send flag set.
+            for (DDS::Vars_iter i = dds->var_begin(); i != dds->var_end(); i++) {
+                if ((*i)->send_p()) {
+                    (*i)->intern_data(eval, *dds);
+                }
             }
         }
-
         // Now that we have constrained the DataDDS and read in the data,
         // send it as ascii
         DataDDS *ascii_dds = datadds_to_ascii_datadds(dds);
-
         get_data_values_as_ascii(ascii_dds, dhi.get_output_stream());
-
         dhi.get_output_stream() << flush;
         delete ascii_dds;
     }
@@ -235,7 +184,7 @@ void BESAsciiTransmit::send_dap4_csv(BESResponseObject *obj, BESDataHandlerInter
     dhi.first_container();
 
     try {
-        // Handle *functional* constraint expressions specially
+        // @TODO Handle *functional* constraint expressions specially
         // Use the D4FunctionDriver class and evaluate the functions, building
         // an new DMR, then evaluate the D4CE in the context of that DMR.
         // This might be coded as "if (there's a function) do this else process the CE".
