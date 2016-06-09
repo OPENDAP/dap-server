@@ -158,18 +158,10 @@ int AsciiArray::print_row(ostream &strm, int index, int number)
         bt = this;
     }
 
-#if 0
-    // basetype_to_asciitype() returns a copy
-    AsciiArray *abt = dynamic_cast<AsciiArray*>(basetype_to_asciitype( bt ));
-    for (int i = 0; i < number; ++i) {
-	dynamic_cast<AsciiOutput*>(abt->var(index++))->print_ascii(strm, false);
-    }
-    dynamic_cast<AsciiOutput*>(abt->var(index++))->print_ascii(strm, false);
-
-    delete abt;
-#else
     // Added 'if (number > 0)' to support zero-length arrays. jhrg 2/2/16
-    if (number > 0) {
+    // Changed to >= 0 to catch the edge case where the rightmost dimension
+    // is constrained to be just one element. jhrg 6/9/16 (See Hyrax-225)
+    if (number >= 0) {
         for (int i = 0; i < number; ++i) {
             BaseType *curr_var = basetype_to_asciitype(bt->var(index++));
             dynamic_cast<AsciiOutput &>(*curr_var).print_ascii(strm, false);
@@ -182,7 +174,6 @@ int AsciiArray::print_row(ostream &strm, int index, int number)
         // we're not saving curr_var for future use, so delete it here
         delete curr_var;
     }
-#endif
 
     return index;
 }
@@ -314,7 +305,7 @@ void AsciiArray::print_complex_array(ostream &strm, bool /*print_name */ )
             "Dimension count is <= 1 while printing multidimensional array.");
 
     // shape holds the maximum index value of all but the last dimension of
-    // the array (not the size; each value is one less that the size).
+    // the array (not the size; each value is one less than the size).
     vector < int >shape = get_shape_vector(dims);
 
     vector < int >state(dims, 0);
