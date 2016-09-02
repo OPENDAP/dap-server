@@ -76,6 +76,61 @@ BESAsciiTransmit::BESAsciiTransmit() :
 
 }
 
+void BESAsciiTransmit::send_basic_ascii(BESResponseObject *obj, BESDataHandlerInterface &dhi)
+{
+    BESDEBUG("ascii", "BESAsciiTransmit::send_basic_ascii() - BEGIN" << endl);
+
+    try { // Expanded try block so all DAP errors are caught. ndp 12/23/2015
+        dhi.first_container();
+
+        BESDataDDSResponse *bdds = dynamic_cast<BESDataDDSResponse *>(obj);
+        if (!bdds) throw BESInternalFatalError("Expected a BESDataDDSResponse instance", __FILE__, __LINE__);
+
+        BESDapResponseBuilder responseBuilder;
+
+        DDS *dds = bdds->get_dds();
+
+        responseBuilder.set_dataset_name(dds->filename());
+        responseBuilder.set_ce(dhi.data[POST_CONSTRAINT]);
+
+        responseBuilder.set_async_accepted(dhi.data[ASYNC]);
+        responseBuilder.set_store_result(dhi.data[STORE_RESULT]);
+
+        // Use the DDS from the ResponseObject along with the parameters
+        // from the DataHandlerInterface to load the DDS with values.
+        DDS *loaded_dds = responseBuilder.intern_dap2_data(dds, bdds->get_ce());
+
+        // if 'loadded_dds' is a different object than the DDS from the BESResponseObject
+        // wrapper, delete the DDS that wrapper holds and load in the one.
+        if (loaded_dds != dds) {
+            delete dds;
+            bdds->set_dds(loaded_dds);
+        }
+
+        // Send data values as CSV/ASCII
+        DDS *ascii_dds = datadds_to_ascii_datadds(loaded_dds);
+        get_data_values_as_ascii(ascii_dds, dhi.get_output_stream());
+        dhi.get_output_stream() << flush;
+        delete ascii_dds;
+    }
+    catch (Error &e) {
+        throw BESDapError("Failed to get values as ascii: " + e.get_error_message(), false, e.get_error_code(), __FILE__, __LINE__);
+    }
+    catch (BESError &e) {
+        throw;
+    }
+    catch (std::exception &e) {
+        throw BESInternalError("Failed to read data: STL Error: " + string(e.what()), __FILE__, __LINE__);
+    }
+    catch (...) {
+        throw BESInternalError("Failed to get values as ascii: Unknown exception caught", __FILE__, __LINE__);
+    }
+
+    BESDEBUG("ascii", "Done BESAsciiTransmit::send_basic_ascii()" << endl);
+
+}
+
+#if 0
 // This version of send_basic_ascii() should work for server functions,
 // including ones that are used in combination with a selection expression.
 // This functionality has not yet been added to the DAP4 version of the
@@ -104,6 +159,7 @@ void BESAsciiTransmit::send_basic_ascii(BESResponseObject *obj, BESDataHandlerIn
 
         // ticket 1248 jhrg 2/23/09
         string ce = www2id(dhi.data[POST_CONSTRAINT], "%", "%20%26");
+
         eval.parse_constraint(ce, *dds);
 
         dds->tag_nested_sequences(); // Tag Sequences as Parent or Leaf node.
@@ -147,6 +203,7 @@ void BESAsciiTransmit::send_basic_ascii(BESResponseObject *obj, BESDataHandlerIn
                 }
             }
         }
+
         // Now that we have constrained the DataDDS and read in the data,
         // send it as ascii
         DDS *ascii_dds = datadds_to_ascii_datadds(dds);
@@ -160,10 +217,14 @@ void BESAsciiTransmit::send_basic_ascii(BESResponseObject *obj, BESDataHandlerIn
     catch (BESError &e) {
         throw;
     }
+    catch (std::exception &e) {
+        throw BESInternalError("Failed to read data: STL Error: " + string(e.what()), __FILE__, __LINE__);
+    }
     catch (...) {
         throw BESInternalError("Failed to get values as ascii: Unknown exception caught", __FILE__, __LINE__);
     }
 }
+#endif
 
 /**
  * Transmits DAP4 Data as Comma Separated Values
