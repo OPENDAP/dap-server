@@ -3,6 +3,14 @@
 m4_include([handler_tests_macros.m4])
 
 AT_BESCMD_RESPONSE_TEST([ascii/fnoc1.data.dods.ascii.bescmd])
+
+# Added these to test different subsetting of a single array and 
+# (see Hyrax-225) the case where the rightmost dim is subset to 
+# a single element. jhrg 6/9/16
+AT_BESCMD_RESPONSE_TEST([ascii/fnoc1.data.dods.ascii2.bescmd])
+AT_BESCMD_RESPONSE_TEST([ascii/fnoc1.data.dods.ascii3.bescmd])
+AT_BESCMD_RESPONSE_TEST([ascii/fnoc1.data.dods.ascii4.bescmd])
+
 AT_BESCMD_RESPONSE_TEST([ascii/fnoc1.data.dap.ascii.bescmd])
 AT_BESCMD_RESPONSE_TEST([ascii/fnoc1.data.dap.ascii_ce_1.bescmd])
 AT_BESCMD_RESPONSE_TEST([ascii/fnoc1.data.dap.ascii_ce_2.bescmd])
