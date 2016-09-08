@@ -81,14 +81,15 @@ void BESAsciiTransmit::send_basic_ascii(BESResponseObject *obj, BESDataHandlerIn
         BESDapResponseBuilder responseBuilder;
         // Use the DDS from the ResponseObject along with the parameters
         // from the DataHandlerInterface to load the DDS with values.
-        // TODO DDS *loaded_dds = responseBuilder.intern_dap2_data(dds, bdds->get_ce());
+        // Note that the BESResponseObject will manage the loaded_dds object's
+        // memory. Make this a shared_ptr<>. jhrg 9/6/16
         DDS *loaded_dds = responseBuilder.intern_dap2_data(obj, dhi);
 
         // Send data values as CSV/ASCII
-        DDS *ascii_dds = datadds_to_ascii_datadds(loaded_dds); //auto_ptr ? jhrg 9/2/16
-        get_data_values_as_ascii(ascii_dds, dhi.get_output_stream());
+        auto_ptr<DDS> ascii_dds(datadds_to_ascii_datadds(loaded_dds));  // unique_ptr<> jhrg 9/6/16
+
+        get_data_values_as_ascii(ascii_dds.get(), dhi.get_output_stream());
         dhi.get_output_stream() << flush;
-        delete ascii_dds;
     }
     catch (Error &e) {
         throw BESDapError("Failed to get values as ascii: " + e.get_error_message(), false, e.get_error_code(), __FILE__, __LINE__);
