@@ -30,14 +30,13 @@
 //      pwest       Patrick West <pwest@ucar.edu>
 //      jgarcia     Jose Garcia <jgarcia@ucar.edu>
 
+#include <DDS.h>
+
 #include "BESWWWResponseHandler.h"
 #include "BESRequestHandlerList.h"
 #include "BESDapNames.h"
 #include "BESWWWNames.h"
 #include "BESWWW.h"
-#if 0
-#include "BESDASResponse.h"
-#endif
 #include "BESDDSResponse.h"
 #include "BESWWWTransmit.h"
 
