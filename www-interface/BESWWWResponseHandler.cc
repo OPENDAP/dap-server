@@ -40,6 +40,8 @@
 #include "BESDDSResponse.h"
 #include "BESWWWTransmit.h"
 
+using namespace libdap;
+
 BESWWWResponseHandler::BESWWWResponseHandler( const string &name )
 :  BESResponseHandler(name)
 {

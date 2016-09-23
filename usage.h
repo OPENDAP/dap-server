@@ -1,4 +1,3 @@
-
 // -*- mode: c++; c-basic-offset:4 -*-
 
 // This file is part of libdap, A C++ implementation of the OPeNDAP Data
@@ -23,16 +22,16 @@
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 
+#include <Error.h>
+
 namespace dap_usage {
- 
-void write_usage_response(ostream &strm, DDS &dds, DAS &das, 
-                          const string &dataset_name = "",
-                          const string &server_name = "",
-			  bool httpheader = true) throw(Error);
 
-void html_header(ostream &strm);
+void write_usage_response(std::ostream &strm, libdap::DDS &dds, libdap::DAS &das, const std::string &dataset_name = "",
+    const std::string &server_name = "", bool httpheader = true) throw (libdap::Error);
 
-string get_user_supplied_docs(string name, string cgi);
+void html_header(std::ostream &strm);
+
+std::string get_user_supplied_docs(std::string name, std::string cgi);
 
 }
 

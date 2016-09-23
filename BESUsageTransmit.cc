@@ -31,17 +31,13 @@
 //      jgarcia     Jose Garcia <jgarcia@ucar.edu>
 
 #include "BESDapTransmit.h"
-#if 0
-#include "DODSFilter.h"
-#endif
 #include "BESUsageTransmit.h"
-// #include "DODSFilter.h"
 #include "BESContainer.h"
 #include "BESDataNames.h"
 #include "mime_util.h"
 #include "BESUsage.h"
 #include "usage.h"
-//#include "util.h"
+
 #include "InternalErr.h"
 #include "BESDapError.h"
 #include "BESInternalFatalError.h"
@@ -49,6 +45,7 @@
 #include "BESDebug.h"
 
 using namespace dap_usage;
+using namespace libdap;
 
 void
  BESUsageTransmit::send_basic_usage(BESResponseObject * obj,

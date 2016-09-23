@@ -41,6 +41,8 @@
 #include "BESDDSResponse.h"
 #include "BESUsageTransmit.h"
 
+using namespace libdap;
+
 BESUsageResponseHandler::BESUsageResponseHandler( const string &name )
     : BESResponseHandler( name )
 {
