@@ -97,7 +97,6 @@ void AsciiOutput::print_ascii(ostream &strm,
 bool AsciiOutput::increment_state(vector < int >*state,
                                   const vector < int >&shape)
 {
-
     DBG(cerr << "Entering increment_state" << endl);
 
     vector < int >::reverse_iterator state_riter;

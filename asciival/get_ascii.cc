@@ -82,10 +82,6 @@ get_data_values_as_ascii(DDS *dds, ostream &strm)
     BESDEBUG("ascii", "Out get_data_values_as_ascii" << endl );
 }
 
-#if 0
-// was... jhrg 5/12/16
-DataDDS *datadds_to_ascii_datadds(DataDDS * dds)
-#endif
 DDS *datadds_to_ascii_datadds(DDS *dds)
 {
     BESDEBUG("ascii", "In datadds_to_ascii_datadds" << endl);
@@ -93,21 +89,17 @@ DDS *datadds_to_ascii_datadds(DDS *dds)
     // factory class? It doesn't matter for the following since the function
     // basetype_to_asciitype() doesn't use the factory. So long as no other
     // code uses the DDS' factory, this is fine. jhrg 9/5/06
-#if 0
-    DataDDS *asciidds = new DataDDS(dds->get_factory(),
-                                    dds->get_dataset_name(),
-                                    dds->get_version(),
-                                    dds->get_protocol());
-#endif
-    DDS *asciidds = new DDS(dds->get_factory(), dds->get_dataset_name());
+   DDS *asciidds = new DDS(dds->get_factory(), dds->get_dataset_name());
 
     DDS::Vars_iter i = dds->var_begin();
     while (i != dds->var_end()) {
         BaseType *abt = basetype_to_asciitype(*i);
-        asciidds->add_var(abt);
+        asciidds->add_var_nocopy(abt);
+#if 0
         // add_var makes a copy of the base type passed to it, so delete
         // it here
         delete abt;
+#endif
         ++i;
     }
 
