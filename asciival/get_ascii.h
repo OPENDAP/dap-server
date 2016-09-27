@@ -23,7 +23,7 @@
 #ifndef E_get_ascii_h
 #define E_get_ascii_h 1
 
-#include <DataDDS.h>
+#include <DDS.h>
 
 namespace libdap {
     class BaseType ;
@@ -31,10 +31,10 @@ namespace libdap {
 
 namespace dap_asciival {
 
-    void get_data_values_as_ascii(libdap::DataDDS *dds, FILE *dest);
-    void get_data_values_as_ascii(libdap::DataDDS *dds, std::ostream &strm);
+    void get_data_values_as_ascii(libdap::DDS *dds, FILE *dest);
+    void get_data_values_as_ascii(libdap::DDS *dds, std::ostream &strm);
 
-    libdap::DataDDS *datadds_to_ascii_datadds(libdap::DataDDS *dds);
+    libdap::DDS *datadds_to_ascii_datadds(libdap::DDS *dds);
 
     libdap::BaseType *basetype_to_asciitype(libdap::BaseType *bt);
 }
